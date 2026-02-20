@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { useStoreContext } from '../../contextApi/ContextApi';
 import { useForm } from 'react-hook-form';
 import { data } from 'autoprefixer';
-import TextField from '../TextField';
+import TextField from '../../components/TextField';
 import { Tooltip } from '@mui/material';
 import { RxCross2 } from 'react-icons/rx';
-import api from '../../api/api';
+import api from '../../api/axiosApi';
 import toast from 'react-hot-toast';
 
 const CreateNewShorten = ({ setOpen, refetch }) => {

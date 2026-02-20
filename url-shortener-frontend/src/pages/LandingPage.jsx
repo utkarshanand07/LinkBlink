@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React from "react";
 import { motion } from "framer-motion";
 
-import Card from "./Card";
+import Card from "../components/Card";
 import { useStoreContext } from "../contextApi/ContextApi";
 
 let desc =
