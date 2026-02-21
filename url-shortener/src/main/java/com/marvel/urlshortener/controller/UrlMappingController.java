@@ -69,4 +69,25 @@ public class UrlMappingController {
         Map<LocalDate, Long> totalClicks = urlMappingService.getTotalClicksByUserAndDate(user, start, end);
         return ResponseEntity.ok(totalClicks);
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> deleteUrl(@PathVariable Long id, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        urlMappingService.deleteUrl(id, user);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/bulk")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> deleteBulkUrls(@RequestBody Map<String, List<Long>> request, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        List<Long> ids = request.get("ids");
+
+        if (ids != null && !ids.isEmpty()) {
+            urlMappingService.deleteUrlsInBulk(ids, user);
+        }
+        return ResponseEntity.ok().build();
+    }
 }

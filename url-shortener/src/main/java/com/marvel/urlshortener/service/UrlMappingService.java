@@ -9,6 +9,7 @@ import com.marvel.urlshortener.repository.ClickEventRepository;
 import com.marvel.urlshortener.repository.UrlMappingRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -102,5 +103,32 @@ public class UrlMappingService {
         }
 
         return urlMapping;
+    }
+
+    @Transactional
+    public void deleteUrl(Long id, User user) {
+        // 1. Securely find the URL verifying it belongs to this user
+        UrlMapping urlMapping = urlMappingRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException("URL not found or you don't have permission to delete it"));
+
+        // 2. Delete associated click events first to prevent foreign key constraint violations
+        clickEventRepository.deleteByUrlMapping(urlMapping);
+
+        // 3. Delete the URL mapping
+        urlMappingRepository.delete(urlMapping);
+    }
+
+    @Transactional
+    public void deleteUrlsInBulk(List<Long> ids, User user) {
+        // 1. Securely find all URLs that match the IDs AND belong to this user
+        List<UrlMapping> urlMappings = urlMappingRepository.findByIdInAndUser(ids, user);
+
+        if (!urlMappings.isEmpty()) {
+            // 2. Safely delete all associated click history first
+            clickEventRepository.deleteByUrlMappingIn(urlMappings);
+
+            // 3. Delete the URLs
+            urlMappingRepository.deleteAll(urlMappings);
+        }
     }
 }
