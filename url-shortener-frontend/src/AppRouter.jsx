@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom"; // <-- Add useLocation here
+import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/NavBar";
 import ShortenUrlPage from "./pages/ShortenUrlPage";
 import { Toaster } from "react-hot-toast";
@@ -12,7 +12,7 @@ import PrivateRoute from "./PrivateRoute";
 import ErrorPage from "./pages/ErrorPage";
 
 const AppRouter = () => {
-  const location = useLocation(); // <-- Initialize the hook here
+  const location = useLocation();
   const hideHeaderFooter = location.pathname.startsWith("/s");
 
     return (

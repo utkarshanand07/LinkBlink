@@ -3,73 +3,74 @@ import { FaLink, FaShareAlt, FaEdit, FaChartLine } from "react-icons/fa";
 
 const AboutPage = () => {
   return (
-    <div className="lg:px-14 sm:px-8 px-5 min-h-[calc(100vh-64px)] pt-2">
-      <div className="bg-white w-full sm:py-10 py-8  ">
-        <h1 className="sm:text-4xl text-slate-800 text-3xl font-bold italic  mb-3">
-          About LinkBlink
-        </h1>
-        <p className="text-gray-700 text-sm  mb-8 xl:w-[60%] lg:w-[70%] sm:w-[80%] w-full ">
-          LinkBlink simplifies URL shortening for efficient sharing. Easily
-          generate, manage, and track your shortened links. LinkBlink simplifies
-          URL shortening for efficient sharing. Easily generate, manage, and
-          track your shortened links. LinkBlink simplifies URL shortening for
-          efficient sharing. Easily generate, manage, and track your shortened
-          links. LinkBlink simplifies URL shortening for efficient sharing.
-          Easily generate, manage, and track your shortened links.
-        </p>
-        <div className="space-y-5 xl:w-[60%] lg:w-[70%] sm:w-[80%] w-full ">
-          <div className="flex items-start">
-            <FaLink className="text-blue-500 text-3xl mr-4" />
-            <div>
-              <h2 className="sm:text-2xl font-bold text-slate-800">
-                Simple URL Shortening
-              </h2>
-              <p className="text-gray-600">
-                Experience the ease of creating short, memorable URLs in just a
-                few clicks. Our intuitive interface and quick setup process
-                ensure you can start shortening URLs without any hassle.
-              </p>
+    <div className="min-h-[calc(100vh-80px)] bg-white py-16 lg:py-24">
+      <div className="max-w-6xl mx-auto px-6 lg:px-16">
+        
+        {/* Header Section */}
+        <div className="max-w-3xl mb-20">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight mb-6">
+            About LinkBlink.
+          </h1>
+          <p className="text-lg text-gray-500 leading-relaxed font-medium">
+            We believe sharing information should be completely frictionless. LinkBlink is designed to transform long, cumbersome URLs into clean, manageable links in seconds, giving you total control over your digital presence.
+          </p>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+          
+          {/* Feature 1 */}
+          <div className="flex flex-col items-start">
+            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+              <FaLink className="text-black text-2xl" />
             </div>
+            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
+              Simple Shortening
+            </h2>
+            <p className="text-gray-500 leading-relaxed">
+              Transform long URLs into short, memorable links instantly. Our streamlined interface gets you straight to the point without the clutter.
+            </p>
           </div>
-          <div className="flex items-start">
-            <FaShareAlt className="text-green-500 text-3xl mr-4" />
-            <div>
-              <h2 className="sm:text-2xl font-bold text-slate-800">
-                Powerful Analytics
-              </h2>
-              <p className="text-gray-600">
-                Gain insights into your link performance with our comprehensive
-                analytics dashboard. Track clicks, geographical data, and
-                referral sources to optimize your marketing strategies.
-              </p>
+
+          {/* Feature 2 */}
+          <div className="flex flex-col items-start">
+            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+              <FaShareAlt className="text-black text-2xl" />
             </div>
+            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
+              Powerful Analytics
+            </h2>
+            <p className="text-gray-500 leading-relaxed">
+              Gain deep insights into your link performance. Track clicks, geographic locations, and referrers to perfectly optimize your reach.
+            </p>
           </div>
-          <div className="flex items-start">
-            <FaEdit className="text-purple-500 text-3xl mr-4" />
-            <div>
-              <h2 className="sm:text-2xl font-bold text-slate-800">
-                Enhanced Security
-              </h2>
-              <p className="text-gray-600">
-                Rest assured with our robust security measures. All shortened
-                URLs are protected with advanced encryption, ensuring your data
-                remains safe and secure.
-              </p>
+
+          {/* Feature 3 */}
+          <div className="flex flex-col items-start">
+            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+              <FaEdit className="text-black text-2xl" />
             </div>
+            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
+              Enhanced Security
+            </h2>
+            <p className="text-gray-500 leading-relaxed">
+              Your data's safety is our priority. Every link is protected with industry-standard encryption and robust security protocols.
+            </p>
           </div>
-          <div className="flex items-start">
-            <FaChartLine className="text-red-500 text-3xl mr-4" />
-            <div>
-              <h2 className="sm:text-2xl font-bold text-slate-800">
-                Fast and Reliable
-              </h2>
-              <p className="text-gray-600">
-                Enjoy lightning-fast redirects and high uptime with our reliable
-                infrastructure. Your shortened URLs will always be available and
-                responsive, ensuring a seamless experience for your users.
-              </p>
+
+          {/* Feature 4 */}
+          <div className="flex flex-col items-start">
+            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+              <FaChartLine className="text-black text-2xl" />
             </div>
+            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
+              Fast and Reliable
+            </h2>
+            <p className="text-gray-500 leading-relaxed">
+              Built for speed and high availability. Enjoy lightning-fast redirects and an infrastructure you can depend on, 24/7.
+            </p>
           </div>
+
         </div>
       </div>
     </div>
