@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useStoreContext } from '../../contextApi/ContextApi';
 import { useForm } from 'react-hook-form';
-import { data } from 'autoprefixer';
 import TextField from '../../components/TextField';
 import { Tooltip } from '@mui/material';
 import { RxCross2 } from 'react-icons/rx';
@@ -44,7 +43,11 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
             });
           });
 
-          // await refetch();
+          // THIS IS THE MAGIC LINE: It triggers the dashboard to update instantly
+          if (refetch) {
+              await refetch();
+          }
+          
           reset();
           setOpen(false);
     } catch (error) {
@@ -54,48 +57,59 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
     }
   };
 
-
   return (
-    <div className=" flex justify-center items-center bg-white rounded-md">
-    <form
+    <div className="flex justify-center items-center w-full max-w-md">
+      <form
         onSubmit={handleSubmit(createShortUrlHandler)}
-        className="sm:w-112.5 w-90 relative  shadow-custom pt-8 pb-5 sm:px-8 px-4 rounded-lg"
+        className="w-full bg-white relative shadow-2xl shadow-black/10 py-8 px-6 sm:px-8 rounded-2xl"
       >
+        
+        {/* Header Section */}
+        <div className="mb-6 pr-8">
+            <h1 className="font-extrabold text-black text-2xl tracking-tight mb-1">
+                Create short link.
+            </h1>
+            <p className="text-gray-500 text-sm font-medium">
+                Paste your long URL below to instantly shorten it.
+            </p>
+        </div>
 
-        <h1 className="font-montserrat sm:mt-0 mt-3 text-center  font-bold sm:text-2xl text-[22px] text-slate-800 ">
-                Create New Shorten Url
-        </h1>
-
-        <hr className="mt-2 sm:mb-5 mb-3 text-slate-950" />
-
-        <div>
+        {/* Input Field */}
+        <div className="mb-6">
           <TextField
-            label="Enter URL"
+            label="Destination URL"
             required
             id="originalUrl"
-            placeholder="https://example.com"
+            placeholder="https://example.com/very/long/path"
             type="url"
-            message="Url is required"
+            message="Please enter a valid URL"
             register={register}
             errors={errors}
           />
         </div>
 
+        {/* Submit Button */}
         <button
-          className="bg-customRed font-semibold text-white w-32  bg-custom-gradient  py-2  transition-colors  rounded-md my-3"
-          type="text"
+          disabled={loading}
+          className={`w-full py-3.5 bg-black text-white font-medium rounded-lg transition-all duration-200 ${
+            loading ? "opacity-70 cursor-not-allowed" : "hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-300"
+          }`}
+          type="submit"
         >
-          {loading ? "Loading..." : "Create"}
+          {loading ? "Creating..." : "Shorten URL"}
         </button>
 
+        {/* Close Button */}
         {!loading && (
           <Tooltip title="Close">
             <button
+              type="button"
               disabled={loading}
               onClick={() => setOpen(false)}
-              className=" absolute right-2 top-2  "
+              className="absolute right-4 top-4 p-2 text-gray-400 hover:text-black hover:bg-gray-50 rounded-full transition-colors duration-200 focus:outline-none"
+              aria-label="Close form"
             >
-              <RxCross2 className="text-slate-800   text-3xl" />
+              <RxCross2 className="text-xl" />
             </button>
           </Tooltip>
         )}
@@ -105,4 +119,4 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
   )
 }
 
-export default CreateNewShorten
+export default CreateNewShorten;

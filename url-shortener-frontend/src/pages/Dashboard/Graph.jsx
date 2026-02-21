@@ -25,25 +25,23 @@ const Graph = ({ graphData }) => {
 
   const data = {
     labels:
-     graphData.length > 0
+      graphData && graphData.length > 0
         ? labels
-        : ["", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        : ["", "", "", "", "", "", "", ""],
     datasets: [
       {
         label: "Total Clicks",
         data:
-         graphData.length > 0
+          graphData && graphData.length > 0
             ? userPerDaya
-            : [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1],
+            : [1, 2, 3, 4, 5, 4, 3, 2],
         backgroundColor:
-         graphData.length > 0 ? "#3b82f6" : "rgba(54, 162, 235, 0.1)",
-        borderColor: "#1D2327",
-        pointBorderColor: "red",
-        fill: true,
-        tension: 0.4,
-        barThickness: 20,
-        categoryPercentage: 1.5,
-        barPercentage: 1.5,
+          graphData && graphData.length > 0 ? "#000000" : "#f3f4f6",
+        borderRadius: 6,
+        borderSkipped: false,
+        barPercentage: 0.5,
+        categoryPercentage: 0.8,
+        maxBarThickness: 48,
       },
     ],
   };
@@ -53,14 +51,43 @@ const Graph = ({ graphData }) => {
     responsive: true,
     plugins: {
       legend: {
-        display: true,
+        display: false,
+      },
+      tooltip: {
+        backgroundColor: "#ffffff",
+        titleColor: "#000000",
+        bodyColor: "#6b7280",
+        borderColor: "#e5e7eb",
+        borderWidth: 1,
+        padding: 12,
+        displayColors: false,
+        titleFont: {
+          family: "'Montserrat', sans-serif",
+          size: 13,
+          weight: "600",
+        },
+        bodyFont: {
+          family: "'Montserrat', sans-serif",
+          size: 14,
+          weight: "700",
+        },
       },
     },
     scales: {
       y: {
         beginAtZero: true,
+        border: { display: false },
+        grid: {
+          color: "#f3f4f6",
+          drawTicks: false,
+        },
         ticks: {
-          // stepSize: 1,
+          color: "#9ca3af",
+          font: {
+            family: "'Montserrat', sans-serif",
+            size: 12,
+            weight: "500",
+          },
           callback: function (value) {
             if (Number.isInteger(value)) {
               return value.toString();
@@ -71,34 +98,32 @@ const Graph = ({ graphData }) => {
         title: {
           display: true,
           text: "Number Of Clicks",
+          color: "#9ca3af",
           font: {
-            family: "Arial",
-            size: 16,
-            weight: "bold",
-            color: "#FF0000",
+            family: "'Montserrat', sans-serif",
+            size: 13,
+            weight: "600",
           },
         },
       },
       x: {
-        beginAtZero: true,
-        // ticks: {
-        //   stepSize: 1,
-        // },
-        title: {
-          display: true,
-          text: "Date",
+        border: { display: false },
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: "#9ca3af",
           font: {
-            family: "Arial",
-            size: 16,
-            weight: "bold",
-            color: "#FF0000",
+            family: "'Montserrat', sans-serif",
+            size: 12,
+            weight: "500",
           },
         },
       },
     },
   };
 
-  return <Bar className=" w-full" data={data} options={options}></Bar>;
+  return <Bar className="w-full h-full" data={data} options={options}></Bar>;
 };
 
 export default Graph;
