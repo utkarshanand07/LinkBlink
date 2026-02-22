@@ -21,7 +21,6 @@ const DashboardLayout = () => {
     const { isLoading: loader, data: totalClicks } = useFetchTotalClicks(token, onError);
 
   return (
-    /* Changed from bg-gray-50 to bg-gray-100 for that slightly darker, higher-contrast canvas */
     <div className="min-h-[calc(100vh-80px)] bg-gray-100 flex flex-col pb-20">
         {loader ? ( 
             <Loader />
@@ -93,7 +92,8 @@ const DashboardLayout = () => {
                         </button>
                     </div>
                 ) : (
-                    <ShortenUrlList data={myShortenUrls} />
+                    // PASSED REFETCH DOWN HERE
+                    <ShortenUrlList data={myShortenUrls} refetch={refetch} />
                 )}
             </div>
         </div>
