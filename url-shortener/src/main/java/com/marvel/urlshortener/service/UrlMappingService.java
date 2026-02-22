@@ -131,4 +131,20 @@ public class UrlMappingService {
             urlMappingRepository.deleteAll(urlMappings);
         }
     }
+
+    @Transactional
+    public UrlMappingDTO updateOriginalUrl(Long id, String newOriginalUrl, User user) {
+        // 1. Securely find the URL verifying it belongs to this user
+        UrlMapping urlMapping = urlMappingRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException("URL not found or you don't have permission to update it"));
+
+        // 2. Update the destination URL
+        urlMapping.setOriginalUrl(newOriginalUrl);
+
+        // 3. Save the changes to the database
+        UrlMapping updatedUrlMapping = urlMappingRepository.save(urlMapping);
+
+        // 4. Return the updated DTO to the frontend
+        return convertToDto(updatedUrlMapping);
+    }
 }

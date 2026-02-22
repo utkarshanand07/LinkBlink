@@ -90,4 +90,17 @@ public class UrlMappingController {
         }
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UrlMappingDTO> updateUrl(@PathVariable Long id,
+                                                   @RequestBody Map<String, String> request,
+                                                   Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        String newOriginalUrl = request.get("originalUrl");
+
+        UrlMappingDTO updatedUrlDTO = urlMappingService.updateOriginalUrl(id, newOriginalUrl, user);
+
+        return ResponseEntity.ok(updatedUrlDTO);
+    }
 }

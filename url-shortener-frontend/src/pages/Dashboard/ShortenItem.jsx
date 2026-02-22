@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { FaExternalLinkAlt, FaRegCalendarAlt, FaTrash } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegCalendarAlt, FaTrash, FaPen } from 'react-icons/fa';
 import { IoCopy } from 'react-icons/io5';
 import { LiaCheckSolid } from 'react-icons/lia';
 import { MdAnalytics, MdOutlineAdsClick } from 'react-icons/md';
@@ -10,7 +10,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useStoreContext } from '../../contextApi/ContextApi';
 import { Hourglass } from 'react-loader-spinner';
 import Graph from './Graph';
-import ConfirmModal from './ConfirmModal'; // Ensure this matches where you saved the modal file
+import ConfirmModal from './ConfirmModal';
+import EditUrlModal from './EditUrlModal';
 
 const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSelected, onToggleSelect, refetch }) => {
     const { token } = useStoreContext();
@@ -21,8 +22,8 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
     const [selectedUrl, setSelectedUrl] = useState("");
     const [analyticsData, setAnalyticsData] = useState([]);
     
-    // State for the single delete modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const frontendUrl = import.meta.env.VITE_REACT_FRONT_END_URL || "localhost:5173";
     const subDomain = frontendUrl.replace(/^https?:\/\//, "");
@@ -67,12 +68,33 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
                     Authorization: "Bearer " + token,
                 },
             });
-            refetch(); // Refresh list after deleting
+            refetch();
         } catch (error) {
             console.error("Error deleting URL:", error);
             alert("Failed to delete URL.");
         }
     }
+
+    const handleEdit = async (newOriginalUrl) => {
+        try {
+            await api.put(`/api/urls/${id}`, { originalUrl: newOriginalUrl }, {
+                headers: {
+                    Authorization: "Bearer " + token,
+                },
+            });
+            refetch();
+        } catch (error) {
+            console.error("Error updating URL:", error);
+            alert("Failed to update URL.");
+        }
+    }
+
+    const handleCopy = () => {
+        setIsCopied(true);
+        setTimeout(() => {
+            setIsCopied(false);
+        }, 2500); 
+    };
 
     useEffect(() => {
         if (selectedUrl) {
@@ -82,16 +104,13 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
 
   return (
     <>
-        {/* Main Card */}
-        <div className={`bg-white border ${isSelected ? 'border-black' : 'border-gray-100'} p-6 rounded-2xl hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300`}>
+        <div className={`bg-white border ${isSelected ? 'border-black ring-1 ring-black' : 'border-gray-200'} p-6 rounded-2xl hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300`}>
           
           {/* Top Section */}
-          <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start w-full gap-6">
             
-            {/* Checkbox and URL Information */}
+            {/* Left: Checkbox and URL Information */}
             <div className="flex items-start gap-4 flex-1">
-                
-                {/* Checkbox Container */}
                 <div className="pt-1.5 shrink-0">
                     <input 
                         type="checkbox" 
@@ -120,7 +139,7 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
                     </div>
 
                     {/* Meta Data (Clicks & Date) */}
-                    <div className="flex items-center gap-6 pt-4">
+                    <div className="flex items-center gap-6 pt-3">
                         <div className="flex items-center gap-1.5 font-medium text-gray-700">
                             <MdOutlineAdsClick className="text-gray-400 text-xl" />
                             <span className="text-sm">{clickCount} {clickCount === 1 ? "Click" : "Clicks"}</span>
@@ -129,49 +148,56 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
                         <div className="flex items-center gap-1.5 font-medium text-gray-700">
                             <FaRegCalendarAlt className="text-gray-400" />
                             <span className="text-sm">
-                            {dayjs(createdDate).format("MMM DD, YYYY")}
+                                {dayjs(createdDate).format("MMM DD, YYYY")}
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex sm:justify-end items-start gap-3 shrink-0">
+            {/* Right: Action Buttons */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap">
                 <CopyToClipboard
-                    onCopy={() => setIsCopied(true)}
+                    onCopy={handleCopy}
                     text={`${import.meta.env.VITE_REACT_FRONT_END_URL + "/s/" + `${shortUrl}`}`}
                 >
-                    <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-black rounded-lg font-medium transition-colors duration-200" title="Copy Link">
-                        <span>{isCopied ? "Copied" : "Copy"}</span>
+                    <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-transparent hover:border-gray-200 text-gray-600 hover:text-black rounded-lg font-medium transition-colors duration-200" title="Copy Link">
+                        <span className="text-sm">{isCopied ? "Copied" : "Copy"}</span>
                         {isCopied ? (
-                            <LiaCheckSolid className="text-lg" />
+                            <LiaCheckSolid className="text-lg text-green-600" />
                         ) : (
                             <IoCopy className="text-lg" />
                         )}
                     </button>
                 </CopyToClipboard>
 
+                <button 
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="flex items-center justify-center p-2.5 bg-gray-50 border border-transparent hover:border-gray-200 text-gray-600 hover:text-black rounded-lg transition-colors duration-200"
+                    title="Edit URL"
+                >
+                    <FaPen className="text-sm" />
+                </button>
+
+                <button 
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="flex items-center justify-center p-2.5 bg-red-50 border border-transparent hover:border-red-200 text-red-600 hover:text-red-700 rounded-lg transition-colors duration-200"
+                    title="Delete URL"
+                >
+                    <FaTrash className="text-sm" />
+                </button>
+
                 <button
                     onClick={() => analyticsHandler(shortUrl)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 ${
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors duration-200 ${
                       analyticToggle 
                         ? "bg-gray-800 text-white" 
                         : "bg-black text-white hover:bg-gray-800"
                     }`}
                     title="View Analytics"
                 >
-                    <span>Analytics</span>
+                    <span className="text-sm">Analytics</span>
                     <MdAnalytics className="text-lg" />
-                </button>
-
-                {/* Single Delete Button */}
-                <button 
-                    onClick={() => setIsDeleteModalOpen(true)}
-                    className="flex items-center justify-center px-4 py-2.5 bg-white border border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 rounded-lg transition-colors duration-200"
-                    title="Delete URL"
-                >
-                    <FaTrash className="text-lg" />
                 </button>
             </div>
           </div>
@@ -216,7 +242,6 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
           
         </div>
 
-        {/* Single Delete Confirmation Modal */}
         <ConfirmModal 
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
@@ -224,8 +249,15 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
             title="Delete URL"
             message="Are you sure you want to permanently delete this URL? This action cannot be undone."
         />
+
+        <EditUrlModal 
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onConfirm={handleEdit}
+            currentOriginalUrl={originalUrl}
+        />
     </>
-  )
+  );
 }
 
 export default ShortenItem;
