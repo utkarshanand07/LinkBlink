@@ -3,10 +3,12 @@ import ShortenItem from './ShortenItem';
 import api from '../../api/axiosApi';
 import { useStoreContext } from '../../contextApi/ContextApi';
 import { FaTrash } from 'react-icons/fa';
+import ConfirmModal from './ConfirmModal'; // Adjust path if needed
 
 const ShortenUrlList = ({ data, refetch }) => {
     const { token } = useStoreContext();
     const [selectedIds, setSelectedIds] = useState([]);
+    const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
 
     const handleToggleSelect = (id) => {
         setSelectedIds((prev) => 
@@ -23,21 +25,18 @@ const ShortenUrlList = ({ data, refetch }) => {
     };
 
     const handleBulkDelete = async () => {
-        if (window.confirm(`Are you sure you want to delete ${selectedIds.length} URLs?`)) {
-            try {
-                await api.delete('/api/urls/bulk', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    // Axios requires DELETE bodies to be in the 'data' property
-                    data: { ids: selectedIds } 
-                });
-                setSelectedIds([]); // Clear selection
-                refetch();          // Refresh the list
-            } catch (error) {
-                console.error("Error bulk deleting URLs:", error);
-                alert("Failed to delete URLs.");
-            }
+        try {
+            await api.delete('/api/urls/bulk', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                data: { ids: selectedIds } 
+            });
+            setSelectedIds([]); // Clear selection
+            refetch();          // Refresh the list
+        } catch (error) {
+            console.error("Error bulk deleting URLs:", error);
+            alert("Failed to delete URLs."); // You could also replace this with a custom toast notification later
         }
     };
 
@@ -64,7 +63,7 @@ const ShortenUrlList = ({ data, refetch }) => {
                         Deselect All
                     </button>
                     <button 
-                        onClick={handleBulkDelete} 
+                        onClick={() => setIsBulkDeleteModalOpen(true)} 
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-200/50"
                     >
                         <FaTrash /> Delete Selected
@@ -83,6 +82,15 @@ const ShortenUrlList = ({ data, refetch }) => {
                 refetch={refetch}
             />
         ))}
+
+        {/* Bulk Delete Confirmation Modal */}
+        <ConfirmModal 
+            isOpen={isBulkDeleteModalOpen}
+            onClose={() => setIsBulkDeleteModalOpen(false)}
+            onConfirm={handleBulkDelete}
+            title="Delete Multiple URLs"
+            message={`Are you sure you want to permanently delete these ${selectedIds.length} selected URLs? This action cannot be undone.`}
+        />
     </div>
   )
 }
