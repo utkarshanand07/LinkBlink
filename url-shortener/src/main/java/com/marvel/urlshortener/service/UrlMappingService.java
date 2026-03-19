@@ -8,6 +8,10 @@ import com.marvel.urlshortener.models.User;
 import com.marvel.urlshortener.repository.ClickEventRepository;
 import com.marvel.urlshortener.repository.UrlMappingRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,35 +62,42 @@ public class UrlMappingService {
         return shortUrl.toString();
     }
 
-    public List<UrlMappingDTO> getUrlsByUser(User user) {
-        return urlMappingRepository.findByUser(user).stream()
-                .map(this::convertToDto)
-                .toList();
+    public Page<UrlMappingDTO> getUrlsByUser(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+        return urlMappingRepository.findByUser(user, pageable).map(this::convertToDto);
     }
 
+    // --- UPDATED: Database-level aggregation for Single URL Analytics ---
     public List<ClickEventDTO> getClickEventsByDate(String shortUrl, LocalDateTime start, LocalDateTime end) {
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
         if (urlMapping != null) {
-            return clickEventRepository.findByUrlMappingAndClickDateBetween(urlMapping, start, end).stream()
-                    .collect(Collectors.groupingBy(click -> click.getClickDate().toLocalDate(), Collectors.counting()))
-                    .entrySet().stream()
-                    .map(entry -> {
-                        ClickEventDTO clickEventDTO = new ClickEventDTO();
-                        clickEventDTO.setClickDate(entry.getKey());
-                        clickEventDTO.setCount(entry.getValue());
-                        return clickEventDTO;
-                    })
-                    .collect(Collectors.toList());
+            List<ClickEventRepository.DailyClickCount> dailyCounts = clickEventRepository.findDailyClicksByUrlMapping(
+                    urlMapping.getId(), start, end
+            );
+
+            return dailyCounts.stream().map(count -> {
+                ClickEventDTO dto = new ClickEventDTO();
+                dto.setClickDate(LocalDate.parse(count.getClickDate())); // Parse MySQL date string
+                dto.setCount(count.getCount());
+                return dto;
+            }).collect(Collectors.toList());
         }
         return null;
     }
 
+    // --- UPDATED: Database-level aggregation for Total User Analytics ---
     public Map<LocalDate, Long> getTotalClicksByUserAndDate(User user, LocalDate start, LocalDate end) {
-        List<UrlMapping> urlMappings = urlMappingRepository.findByUser(user);
-        List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingInAndClickDateBetween(urlMappings, start.atStartOfDay(), end.plusDays(1).atStartOfDay());
-        return clickEvents.stream()
-                .collect(Collectors.groupingBy(click -> click.getClickDate().toLocalDate(), Collectors.counting()));
+        List<ClickEventRepository.DailyClickCount> dailyCounts = clickEventRepository.findTotalDailyClicksByUser(
+                user.getId(),
+                start.atStartOfDay(),
+                end.plusDays(1).atStartOfDay()
+        );
 
+        return dailyCounts.stream()
+                .collect(Collectors.toMap(
+                        count -> LocalDate.parse(count.getClickDate()), // Parse MySQL date string
+                        ClickEventRepository.DailyClickCount::getCount
+                ));
     }
 
     public UrlMapping getOriginalUrl(String shortUrl) {

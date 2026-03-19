@@ -12,13 +12,20 @@ const DashboardLayout = () => {
     const { token } = useStoreContext();
     const navigate = useNavigate();
     const [shortenPopUp, setShortenPopUp] = useState(false);
+    
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const size = 10;
 
     function onError() {
       navigate("/error");
     }
 
-    const { isLoading, data: myShortenUrls, refetch } = useFetchMyShortUrls(token, onError);
+    const { isLoading, data: myShortenUrlsData, refetch } = useFetchMyShortUrls(token, page, size, onError);
     const { isLoading: loader, data: totalClicks } = useFetchTotalClicks(token, onError);
+
+    // Check if we have URLs inside the Spring Boot 'content' array
+    const hasUrls = myShortenUrlsData?.content && myShortenUrlsData.content.length > 0;
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-gray-100 flex flex-col pb-20">
@@ -72,28 +79,38 @@ const DashboardLayout = () => {
                     Manage and view details for all your shortened URLs.
                 </p>
 
-                {!isLoading && (!myShortenUrls || myShortenUrls.length === 0) ? (
+                {isLoading ? (
+                    <Loader />
+                ) : !hasUrls ? (
                     /* Premium Empty State */
                     <div className="flex flex-col items-center justify-center py-20 px-6 border-2 border-dashed border-gray-300 rounded-2xl bg-white mt-6">
                         <div className="bg-gray-100 p-4 rounded-full mb-4">
                             <FaLink className="text-gray-400 text-2xl" />
                         </div>
                         <h1 className="text-black text-lg font-bold tracking-tight mb-2">
-                            No links created yet
+                            No links found
                         </h1>
                         <p className="text-sm text-gray-500 font-medium mb-6 text-center max-w-md">
-                            You haven't shortened any URLs. Click the button above to create your first short link.
+                            {page === 0 
+                                ? "You haven't shortened any URLs. Click the button above to create your first short link."
+                                : "No more URLs found on this page."}
                         </p>
-                        <button
-                            className="bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-black px-6 py-2.5 rounded-lg font-medium transition-colors duration-200"
-                            onClick={() => setShortenPopUp(true)}
-                        >
-                            Create your first link
-                        </button>
+                        {page === 0 && (
+                            <button
+                                className="bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-black px-6 py-2.5 rounded-lg font-medium transition-colors duration-200"
+                                onClick={() => setShortenPopUp(true)}
+                            >
+                                Create your first link
+                            </button>
+                        )}
                     </div>
                 ) : (
-                    // PASSED REFETCH DOWN HERE
-                    <ShortenUrlList data={myShortenUrls} refetch={refetch} />
+                    <ShortenUrlList 
+                        data={myShortenUrlsData} 
+                        refetch={refetch} 
+                        currentPage={page} 
+                        setPage={setPage} 
+                    />
                 )}
             </div>
         </div>
