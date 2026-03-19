@@ -3,6 +3,7 @@ package com.marvel.urlshortener.service;
 import com.marvel.urlshortener.dtos.ClickEventDTO;
 import com.marvel.urlshortener.dtos.UrlMappingDTO;
 import com.marvel.urlshortener.models.ClickEvent;
+import com.marvel.urlshortener.models.Tier;
 import com.marvel.urlshortener.models.UrlMapping;
 import com.marvel.urlshortener.models.User;
 import com.marvel.urlshortener.repository.ClickEventRepository;
@@ -29,12 +30,32 @@ public class UrlMappingService {
     private ClickEventRepository clickEventRepository;
 
     public UrlMappingDTO createShortUrl(String originalUrl, User user) {
+        // 1. Determine Tier (Defaults to ROLE_GUEST if user is null)
+        Tier userTier = (user == null) ? Tier.ROLE_GUEST : Tier.valueOf(user.getRole());
+
+        // 2. Enforce limits for logged-in users
+        if (user != null) {
+            long currentLinks = urlMappingRepository.countByUser(user);
+            if (currentLinks >= userTier.getMaxLinks()) {
+                throw new RuntimeException("Limit reached for your current plan (" + userTier.getMaxLinks() + " links). Please upgrade your tier to create more.");
+            }
+        }
+
+        // 3. Create Mapping
         String shortUrl = generateShortUrl();
         UrlMapping urlMapping = new UrlMapping();
         urlMapping.setOriginalUrl(originalUrl);
         urlMapping.setShortUrl(shortUrl);
         urlMapping.setUser(user);
         urlMapping.setCreatedDate(LocalDateTime.now());
+
+        // 4. Set Expiry Date based on Tier
+        if (userTier.getExpirationDays() != null) {
+            urlMapping.setExpiresAt(LocalDateTime.now().plusDays(userTier.getExpirationDays()));
+        } else {
+            urlMapping.setExpiresAt(null); // Never expires
+        }
+
         UrlMapping savedUrlMapping = urlMappingRepository.save(urlMapping);
         return convertToDto(savedUrlMapping);
     }
@@ -46,7 +67,17 @@ public class UrlMappingService {
         urlMappingDTO.setShortUrl(urlMapping.getShortUrl());
         urlMappingDTO.setClickCount(urlMapping.getClickCount());
         urlMappingDTO.setCreatedDate(urlMapping.getCreatedDate());
-        urlMappingDTO.setUsername(urlMapping.getUser().getUsername());
+
+        // NEW: Pass expiration date to frontend
+        urlMappingDTO.setExpiresAt(urlMapping.getExpiresAt());
+
+        // Handle guest user safely
+        if (urlMapping.getUser() != null) {
+            urlMappingDTO.setUsername(urlMapping.getUser().getUsername());
+        } else {
+            urlMappingDTO.setUsername("Guest");
+        }
+
         return urlMappingDTO;
     }
 
@@ -67,7 +98,6 @@ public class UrlMappingService {
         return urlMappingRepository.findByUser(user, pageable).map(this::convertToDto);
     }
 
-    // --- UPDATED: Database-level aggregation for Single URL Analytics ---
     public List<ClickEventDTO> getClickEventsByDate(String shortUrl, LocalDateTime start, LocalDateTime end) {
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
         if (urlMapping != null) {
@@ -77,7 +107,7 @@ public class UrlMappingService {
 
             return dailyCounts.stream().map(count -> {
                 ClickEventDTO dto = new ClickEventDTO();
-                dto.setClickDate(LocalDate.parse(count.getClickDate())); // Parse MySQL date string
+                dto.setClickDate(LocalDate.parse(count.getClickDate()));
                 dto.setCount(count.getCount());
                 return dto;
             }).collect(Collectors.toList());
@@ -85,7 +115,6 @@ public class UrlMappingService {
         return null;
     }
 
-    // --- UPDATED: Database-level aggregation for Total User Analytics ---
     public Map<LocalDate, Long> getTotalClicksByUserAndDate(User user, LocalDate start, LocalDate end) {
         List<ClickEventRepository.DailyClickCount> dailyCounts = clickEventRepository.findTotalDailyClicksByUser(
                 user.getId(),
@@ -95,7 +124,7 @@ public class UrlMappingService {
 
         return dailyCounts.stream()
                 .collect(Collectors.toMap(
-                        count -> LocalDate.parse(count.getClickDate()), // Parse MySQL date string
+                        count -> LocalDate.parse(count.getClickDate()),
                         ClickEventRepository.DailyClickCount::getCount
                 ));
     }
@@ -106,7 +135,6 @@ public class UrlMappingService {
             urlMapping.setClickCount(urlMapping.getClickCount() + 1);
             urlMappingRepository.save(urlMapping);
 
-            // Record Click Event
             ClickEvent clickEvent = new ClickEvent();
             clickEvent.setClickDate(LocalDateTime.now());
             clickEvent.setUrlMapping(urlMapping);
@@ -118,44 +146,31 @@ public class UrlMappingService {
 
     @Transactional
     public void deleteUrl(Long id, User user) {
-        // 1. Securely find the URL verifying it belongs to this user
         UrlMapping urlMapping = urlMappingRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new RuntimeException("URL not found or you don't have permission to delete it"));
 
-        // 2. Delete associated click events first to prevent foreign key constraint violations
         clickEventRepository.deleteByUrlMapping(urlMapping);
-
-        // 3. Delete the URL mapping
         urlMappingRepository.delete(urlMapping);
     }
 
     @Transactional
     public void deleteUrlsInBulk(List<Long> ids, User user) {
-        // 1. Securely find all URLs that match the IDs AND belong to this user
         List<UrlMapping> urlMappings = urlMappingRepository.findByIdInAndUser(ids, user);
 
         if (!urlMappings.isEmpty()) {
-            // 2. Safely delete all associated click history first
             clickEventRepository.deleteByUrlMappingIn(urlMappings);
-
-            // 3. Delete the URLs
             urlMappingRepository.deleteAll(urlMappings);
         }
     }
 
     @Transactional
     public UrlMappingDTO updateOriginalUrl(Long id, String newOriginalUrl, User user) {
-        // 1. Securely find the URL verifying it belongs to this user
         UrlMapping urlMapping = urlMappingRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new RuntimeException("URL not found or you don't have permission to update it"));
 
-        // 2. Update the destination URL
         urlMapping.setOriginalUrl(newOriginalUrl);
-
-        // 3. Save the changes to the database
         UrlMapping updatedUrlMapping = urlMappingRepository.save(urlMapping);
 
-        // 4. Return the updated DTO to the frontend
         return convertToDto(updatedUrlMapping);
     }
 }

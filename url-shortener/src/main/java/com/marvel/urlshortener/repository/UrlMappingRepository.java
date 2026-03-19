@@ -19,4 +19,6 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
     Optional<UrlMapping> findByIdAndUser(Long id, User user);
     List<UrlMapping> findByIdInAndUser(List<Long> ids, User user);
+
+    long countByUser(User user);
 }

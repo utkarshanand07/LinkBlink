@@ -17,10 +17,12 @@ public class UrlMapping {
     private int clickCount = 0;
     private LocalDateTime createdDate;
 
+    private LocalDateTime expiresAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "urlMapping")
+    @OneToMany(mappedBy = "urlMapping", cascade = CascadeType.REMOVE)
     private List<ClickEvent> clickEvents;
 }

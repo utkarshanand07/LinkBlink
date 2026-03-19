@@ -7,6 +7,7 @@ import com.marvel.urlshortener.service.UrlMappingService;
 import com.marvel.urlshortener.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,19 +26,29 @@ public class UrlMappingController {
     private UrlMappingService urlMappingService;
     private UserService userService;
 
+    // REMOVED @PreAuthorize so guests can access
     @PostMapping("/shorten")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<UrlMappingDTO> createShortUrl(@RequestBody Map<String, String> request,
-                                                        Principal principal){
+    public ResponseEntity<?> createShortUrl(@RequestBody Map<String, String> request,
+                                            Principal principal){
         String originalUrl = request.get("originalUrl");
-        User user = userService.findByUsername(principal.getName());
-        UrlMappingDTO urlMappingDTO = urlMappingService.createShortUrl(originalUrl, user);
-        return ResponseEntity.ok(urlMappingDTO);
+        User user = null;
+
+        if (principal != null) {
+            user = userService.findByUsername(principal.getName());
+        }
+
+        try {
+            UrlMappingDTO urlMappingDTO = urlMappingService.createShortUrl(originalUrl, user);
+            return ResponseEntity.ok(urlMappingDTO);
+        } catch (RuntimeException e) {
+            // Return 403 Forbidden if they hit their tier limit
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        }
     }
 
-
+    // UPDATED Authorization to match your new Tier names
     @GetMapping("/myurls")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('BASIC', 'PRO', 'ENTERPRISE', 'ADMIN')")
     public ResponseEntity<Page<UrlMappingDTO>> getUserUrls(
             Principal principal,
             @RequestParam(defaultValue = "0") int page,
@@ -48,9 +59,8 @@ public class UrlMappingController {
         return ResponseEntity.ok(urls);
     }
 
-
     @GetMapping("/analytics/{shortUrl}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('BASIC', 'PRO', 'ENTERPRISE', 'ADMIN')")
     public ResponseEntity<List<ClickEventDTO>> getUrlAnalytics(@PathVariable String shortUrl,
                                                                @RequestParam("startDate") String startDate,
                                                                @RequestParam("endDate") String endDate){
@@ -61,9 +71,8 @@ public class UrlMappingController {
         return ResponseEntity.ok(clickEventDTOS);
     }
 
-
     @GetMapping("/totalClicks")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('BASIC', 'PRO', 'ENTERPRISE', 'ADMIN')")
     public ResponseEntity<Map<LocalDate, Long>> getTotalClicksByDate(Principal principal,
                                                                      @RequestParam("startDate") String startDate,
                                                                      @RequestParam("endDate") String endDate){
@@ -76,16 +85,15 @@ public class UrlMappingController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('BASIC', 'PRO', 'ENTERPRISE', 'ADMIN')")
     public ResponseEntity<Void> deleteUrl(@PathVariable Long id, Principal principal) {
         User user = userService.findByUsername(principal.getName());
         urlMappingService.deleteUrl(id, user);
-
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/bulk")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('BASIC', 'PRO', 'ENTERPRISE', 'ADMIN')")
     public ResponseEntity<Void> deleteBulkUrls(@RequestBody Map<String, List<Long>> request, Principal principal) {
         User user = userService.findByUsername(principal.getName());
         List<Long> ids = request.get("ids");
@@ -97,7 +105,7 @@ public class UrlMappingController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('BASIC', 'PRO', 'ENTERPRISE', 'ADMIN')")
     public ResponseEntity<UrlMappingDTO> updateUrl(@PathVariable Long id,
                                                    @RequestBody Map<String, String> request,
                                                    Principal principal) {
@@ -105,7 +113,6 @@ public class UrlMappingController {
         String newOriginalUrl = request.get("originalUrl");
 
         UrlMappingDTO updatedUrlDTO = urlMappingService.updateOriginalUrl(id, newOriginalUrl, user);
-
         return ResponseEntity.ok(updatedUrlDTO);
     }
 }
