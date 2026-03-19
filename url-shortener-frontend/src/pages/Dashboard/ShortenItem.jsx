@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { FaExternalLinkAlt, FaRegCalendarAlt, FaTrash, FaPen } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaRegCalendarAlt, FaTrash, FaPen, FaQrcode } from 'react-icons/fa';
 import { IoCopy } from 'react-icons/io5';
 import { LiaCheckSolid } from 'react-icons/lia';
 import { MdAnalytics, MdOutlineAdsClick } from 'react-icons/md';
@@ -12,6 +12,7 @@ import { Hourglass } from 'react-loader-spinner';
 import Graph from './Graph';
 import ConfirmModal from './ConfirmModal';
 import EditUrlModal from './EditUrlModal';
+import QrCodeModal from './QrCodeModal';
 
 const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSelected, onToggleSelect, refetch }) => {
     const { token } = useStoreContext();
@@ -24,6 +25,7 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
     
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isQrModalOpen, setIsQrModalOpen] = useState(false); // State for QR Modal
 
     const frontendUrl = import.meta.env.VITE_REACT_FRONT_END_URL || "localhost:5173";
     const subDomain = frontendUrl.replace(/^https?:\/\//, "");
@@ -171,6 +173,15 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
                     </button>
                 </CopyToClipboard>
 
+                {/* QR Code Button */}
+                <button 
+                    onClick={() => setIsQrModalOpen(true)}
+                    className="flex items-center justify-center p-2.5 bg-gray-50 border border-transparent hover:border-gray-200 text-gray-600 hover:text-black rounded-lg transition-colors duration-200"
+                    title="Generate QR Code"
+                >
+                    <FaQrcode className="text-sm" />
+                </button>
+
                 <button 
                     onClick={() => setIsEditModalOpen(true)}
                     className="flex items-center justify-center p-2.5 bg-gray-50 border border-transparent hover:border-gray-200 text-gray-600 hover:text-black rounded-lg transition-colors duration-200"
@@ -255,6 +266,12 @@ const ShortenItem = ({ id, originalUrl, shortUrl, clickCount, createdDate, isSel
             onClose={() => setIsEditModalOpen(false)}
             onConfirm={handleEdit}
             currentOriginalUrl={originalUrl}
+        />
+
+        <QrCodeModal 
+            isOpen={isQrModalOpen}
+            onClose={() => setIsQrModalOpen(false)}
+            shortUrl={shortUrl}
         />
     </>
   );
