@@ -1,5 +1,6 @@
-package com.marvel.urlshortener.security.jwt;
+package com.marvel.urlshortener.security;
 
+import com.marvel.urlshortener.security.jwt.JwtAuthenticationFilter;
 import com.marvel.urlshortener.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/urls/shorten").permitAll()
+
                         .requestMatchers("/api/urls/**").authenticated()
                         .requestMatchers("/{shortUrl}").permitAll()
                         .anyRequest().authenticated()

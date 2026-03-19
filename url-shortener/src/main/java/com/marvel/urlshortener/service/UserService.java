@@ -1,6 +1,7 @@
 package com.marvel.urlshortener.service;
 
 import com.marvel.urlshortener.dtos.LoginRequest;
+import com.marvel.urlshortener.models.Tier;
 import com.marvel.urlshortener.models.User;
 import com.marvel.urlshortener.repository.UserRepository;
 import com.marvel.urlshortener.security.jwt.JwtAuthenticationResponse;
@@ -24,6 +25,9 @@ public class UserService {
 
     public User registerUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        user.setRole(Tier.ROLE_BASIC.name());
+
         return userRepository.save(user);
     }
 
