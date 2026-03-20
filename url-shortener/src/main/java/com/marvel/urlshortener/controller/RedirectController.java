@@ -4,6 +4,7 @@ import com.marvel.urlshortener.models.UrlMapping;
 import com.marvel.urlshortener.service.UrlMappingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,14 +16,15 @@ public class RedirectController {
     private UrlMappingService urlMappingService;
 
     @GetMapping("/{shortUrl}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortUrl){
+    public ResponseEntity<?> redirect(@PathVariable String shortUrl){
         UrlMapping urlMapping = urlMappingService.getOriginalUrl(shortUrl);
         if (urlMapping != null) {
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Location", urlMapping.getOriginalUrl());
             return ResponseEntity.status(302).headers(httpHeaders).build();
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.GONE)
+                    .body("This URL has expired or does not exist.");
         }
     }
 }

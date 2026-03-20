@@ -95,7 +95,16 @@ public class UrlMappingService {
 
     public Page<UrlMappingDTO> getUrlsByUser(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
-        return urlMappingRepository.findByUser(user, pageable).map(this::convertToDto);
+
+        Page<UrlMapping> urlPage = urlMappingRepository.findByUser(user, pageable);
+
+        urlPage.forEach(url -> {
+            if (url.getExpiresAt() != null && url.getExpiresAt().isBefore(LocalDateTime.now())) {
+                deleteExpiredUrlInternal(url);
+            }
+        });
+
+        return urlPage.map(this::convertToDto);
     }
 
     public List<ClickEventDTO> getClickEventsByDate(String shortUrl, LocalDateTime start, LocalDateTime end) {
@@ -132,6 +141,11 @@ public class UrlMappingService {
     public UrlMapping getOriginalUrl(String shortUrl) {
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
         if (urlMapping != null) {
+
+            if (isExpired(urlMapping)) {
+                return null; // Treat it as if it doesn't exist anymore
+            }
+
             urlMapping.setClickCount(urlMapping.getClickCount() + 1);
             urlMappingRepository.save(urlMapping);
 
@@ -172,5 +186,22 @@ public class UrlMappingService {
         UrlMapping updatedUrlMapping = urlMappingRepository.save(urlMapping);
 
         return convertToDto(updatedUrlMapping);
+    }
+
+    private boolean isExpired(UrlMapping urlMapping) {
+        if (urlMapping.getExpiresAt() != null && urlMapping.getExpiresAt().isBefore(LocalDateTime.now())) {
+            // It's expired! Perform lazy deletion
+            // We use the ID directly to avoid complex object state issues during deletion
+            deleteExpiredUrlInternal(urlMapping);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    protected void deleteExpiredUrlInternal(UrlMapping urlMapping) {
+        // Clean up clicks first, then the mapping
+        clickEventRepository.deleteByUrlMapping(urlMapping);
+        urlMappingRepository.delete(urlMapping);
     }
 }
