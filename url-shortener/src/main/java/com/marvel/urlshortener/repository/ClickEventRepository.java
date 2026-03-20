@@ -12,21 +12,37 @@ import java.util.List;
 
 @Repository
 public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
+    // SHARED: UrlMappingService & AdminService (Deletions)
+
+    // Used when deleting a single URL to prevent Foreign Key errors
+    void deleteByUrlMapping(UrlMapping urlMapping);
+
+    // Used during Bulk Deletes and Admin cleanup jobs
+    void deleteByUrlMappingIn(List<UrlMapping> urlMappings);
+
+
+    // USED BY: AdminService (Analytics Management)
+
+    // Admin: Wipe all click history for a specific link without fetching the entities first
+    void deleteByUrlMappingId(Long urlMappingId);
+
+
+    // USED BY: UrlMappingService (Legacy Fallbacks)
+
+    // Note: These are kept for backward compatibility, but the optimized Native Queries below are preferred.
     List<ClickEvent> findByUrlMappingAndClickDateBetween(UrlMapping mapping, LocalDateTime startDate, LocalDateTime endDate);
     List<ClickEvent> findByUrlMappingInAndClickDateBetween(List<UrlMapping> urlMappings, LocalDateTime startDate, LocalDateTime endDate);
 
-    void deleteByUrlMapping(UrlMapping urlMapping);
-    void deleteByUrlMappingIn(List<UrlMapping> urlMappings);
 
-    // --- NEW: Analytics Optimization ---
+    // USED BY: UrlMappingService (Optimized Analytics)
 
-    // Projection to hold the mapped SQL results
+    // Projection interface to hold the mapped SQL results
     interface DailyClickCount {
         String getClickDate(); // MySQL DATE() returns YYYY-MM-DD as a String
         Long getCount();
     }
 
-    // 1. Optimized query for a specific user's total clicks
+    // 1. Optimized query for a specific user's total clicks across all their links
     @Query(value = "SELECT DATE(c.click_date) as clickDate, COUNT(c.id) as count " +
             "FROM click_event c JOIN url_mapping u ON c.url_mapping_id = u.id " +
             "WHERE u.user_id = :userId AND c.click_date >= :startDate AND c.click_date < :endDate " +
@@ -38,7 +54,7 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
             @Param("endDate") LocalDateTime endDate
     );
 
-    // 2. Optimized query for a single specific URL
+    // 2. Optimized query for a single specific URL's clicks
     @Query(value = "SELECT DATE(c.click_date) as clickDate, COUNT(c.id) as count " +
             "FROM click_event c " +
             "WHERE c.url_mapping_id = :urlId AND c.click_date >= :startDate AND c.click_date <= :endDate " +

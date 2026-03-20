@@ -7,18 +7,44 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
-    UrlMapping findByShortUrl(String shortUrl);
-    List<UrlMapping> findByUser(User user);
+    // USED BY: UrlMappingService (Core App Logic)
 
-    Page<UrlMapping> findByUser(User user, Pageable pageable);
+    UrlMapping findByShortUrl(String shortUrl);
 
     Optional<UrlMapping> findByIdAndUser(Long id, User user);
+
     List<UrlMapping> findByIdInAndUser(List<Long> ids, User user);
 
+    // Used to enforce Tier limits during link creation
     long countByUser(User user);
+
+
+    // SHARED: UrlMappingService & AdminService
+
+    // Used by UrlMappingService (Dashboard) and AdminService (Viewing specific user links)
+    Page<UrlMapping> findByUser(User user, Pageable pageable);
+
+    // Used by UrlMappingService (Total Clicks limit check) and AdminService (Cascading deletes)
+    List<UrlMapping> findByUser(User user);
+
+
+    // USED BY: AdminService (Super Admin Dashboard)
+
+    // Admin: Fetch all links in the entire database (paginated)
+    Page<UrlMapping> findAll(Pageable pageable);
+
+    // Admin: Filter links by when they were created
+    Page<UrlMapping> findByCreatedDateBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    // Admin: Filter links by when they expire
+    Page<UrlMapping> findByExpiresAtBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    // Admin: Find all expired links for the cleanup job
+    List<UrlMapping> findByExpiresAtBefore(LocalDateTime time);
 }
