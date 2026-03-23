@@ -6,7 +6,7 @@ import { useStoreContext } from "../contextApi/ContextApi";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { token, setToken } = useStoreContext();
+  const { token, setToken, isAdmin } = useStoreContext(); 
   const path = useLocation().pathname;
   const [navbarOpen, setNavbarOpen] = useState(false);
 
@@ -67,6 +67,23 @@ const Navbar = () => {
                 onClick={() => setNavbarOpen(false)}
               >
                 Dashboard
+              </Link>
+            </li>
+          )}
+
+          {/* NEW: Admin Button strictly visible to Admins */}
+          {isAdmin && (
+            <li>
+              <Link
+                className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
+                  path.startsWith("/admin")
+                    ? "text-blue-600"
+                    : "text-gray-500 hover:text-blue-600"
+                }`}
+                to="/admin"
+                onClick={() => setNavbarOpen(false)}
+              >
+                <span></span> Admin Panel
               </Link>
             </li>
           )}

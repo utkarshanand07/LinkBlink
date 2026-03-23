@@ -10,6 +10,8 @@ import LoginPage from "./pages/LoginPage";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 import PrivateRoute from "./PrivateRoute";
 import ErrorPage from "./pages/ErrorPage";
+import AdminRoute from "./AdminRoute";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 const AppRouter = () => {
   const location = useLocation();
@@ -28,6 +30,9 @@ const AppRouter = () => {
           <Route path="/login" element={<PrivateRoute publicPage={true}><LoginPage /></PrivateRoute>} />
           
           <Route path="/dashboard" element={ <PrivateRoute publicPage={false}><DashboardLayout /></PrivateRoute>} />
+          
+          <Route path="/admin" element={ <AdminRoute><AdminDashboard /></AdminRoute>} />
+          
           <Route path="/error" element={ <ErrorPage />} />
           <Route path="*" element={ <ErrorPage message="We can't seem to find the page you're looking for"/>} />
         </Routes>
