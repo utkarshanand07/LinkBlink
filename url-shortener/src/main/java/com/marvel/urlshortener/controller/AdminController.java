@@ -96,6 +96,12 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/users/{userId}/links")
+    public ResponseEntity<Void> clearLinksForUser(@PathVariable Long userId) {
+        adminService.clearLinksForUser(userId);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/users/{userId}/clicks")
     public ResponseEntity<Void> clearClicksForUser(@PathVariable Long userId) {
         adminService.clearClicksForUser(userId);

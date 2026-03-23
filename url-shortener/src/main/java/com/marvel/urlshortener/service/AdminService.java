@@ -35,10 +35,13 @@ public class AdminService {
 
     @Transactional
     public void changeUserRole(Long userId, String newRole) {
+        if ("ROLE_GUEST".equals(newRole)) {
+            throw new RuntimeException("Cannot assign GUEST role to a registered user.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Verify it's a valid tier before assigning
         try {
             Tier tier = Tier.valueOf(newRole);
             user.setRole(tier.name());
@@ -94,6 +97,18 @@ public class AdminService {
         if (!links.isEmpty()) {
             clickEventRepository.deleteByUrlMappingIn(links);
             urlMappingRepository.deleteAll(links);
+        }
+    }
+
+    @Transactional
+    public void clearLinksForUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<UrlMapping> userLinks = urlMappingRepository.findByUser(user);
+        if (!userLinks.isEmpty()) {
+            clickEventRepository.deleteByUrlMappingIn(userLinks);
+            urlMappingRepository.deleteAll(userLinks);
         }
     }
 
