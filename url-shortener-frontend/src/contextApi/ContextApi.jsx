@@ -1,7 +1,20 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"; // <-- Make sure to install this!
+import { jwtDecode } from "jwt-decode"; 
 
 const ContextApi = createContext();
+
+const checkIsAdmin = (tokenPayload) => {
+    if (!tokenPayload) return false;
+    try {
+        const decodedToken = jwtDecode(tokenPayload);
+        const authorities = decodedToken.authorities || decodedToken.roles || decodedToken.role || [];
+        const roleString = Array.isArray(authorities) ? authorities.join(",") : String(authorities);
+        return roleString.includes("ROLE_ADMIN");
+    } catch (error) {
+        console.error("Invalid token format", error);
+        return false;
+    }
+};
 
 export const ContextProvider = ({ children }) => {
     const getToken = localStorage.getItem("JWT_TOKEN")
@@ -9,32 +22,17 @@ export const ContextProvider = ({ children }) => {
         : null;
 
     const [token, setToken] = useState(getToken);
-    const [isAdmin, setIsAdmin] = useState(false);
+    
+    const [isAdmin, setIsAdmin] = useState(() => checkIsAdmin(getToken));
 
-    // NEW: Decode the token to check for the Admin role
     useEffect(() => {
-        if (token) {
-            try {
-                const decodedToken = jwtDecode(token);
-                // Spring Security stores roles differently depending on JwtUtils config. 
-                // We check the most common claim names: 'authorities', 'roles', or 'role'.
-                const authorities = decodedToken.authorities || decodedToken.roles || decodedToken.role || [];
-                const roleString = Array.isArray(authorities) ? authorities.join(",") : String(authorities);
-                
-                setIsAdmin(roleString.includes("ROLE_ADMIN"));
-            } catch (error) {
-                console.error("Invalid token format", error);
-                setIsAdmin(false);
-            }
-        } else {
-            setIsAdmin(false);
-        }
+        setIsAdmin(checkIsAdmin(token));
     }, [token]);
 
     const sendData = {
         token,
         setToken,
-        isAdmin, // <-- Export isAdmin so the Navbar and Router can use it
+        isAdmin,
     };
 
     return <ContextApi.Provider value={sendData}>{children}</ContextApi.Provider>

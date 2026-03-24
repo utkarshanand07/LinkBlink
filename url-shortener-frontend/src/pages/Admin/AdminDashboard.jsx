@@ -75,7 +75,7 @@ const AdminDashboard = () => {
                     {activeTab === "links" && <LinksTable />}
 
                     {activeTab === "system" && (
-                        <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-6 sm:p-8 min-h-[400px]">
+                        <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-6 sm:p-8 min-h-100">
                             <h2 className="text-2xl font-bold text-black tracking-tight mb-2">System Maintenance</h2>
                             <p className="text-sm text-gray-500 font-medium mb-8 max-w-xl">
                                 Force a manual database sweep to remove all URLs that have passed their expiration date. This frees up database storage.

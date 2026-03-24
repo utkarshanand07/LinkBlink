@@ -133,7 +133,7 @@ const UsersTable = () => {
             {/* Table Card */}
             <div className="bg-white border border-gray-200 shadow-sm rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                    <table className="w-full text-left border-collapse min-w-250">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-200">
                                 <th className="px-6 py-5 w-12 text-center"></th>
@@ -200,7 +200,7 @@ const UsersTable = () => {
                             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={isFirst} className={`flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors ${isFirst ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-transparent' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm'}`}>
                                 <FaChevronLeft className="text-xs mr-2" /> Previous
                             </button>
-                            <div className="flex items-center gap-1 hidden sm:flex">
+                            <div className="flex items-center gap-1 sm:flex">
                                 {getPageNumbers().map((num, i) => num === '...' ? <span key={`ell-${i}`} className="px-2 text-gray-400">...</span> : (
                                     <button key={num} onClick={() => setPage(num)} className={`w-10 h-10 flex items-center justify-center text-sm font-bold rounded-xl transition-colors ${page === num ? 'bg-black text-white shadow-md' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm'}`}>
                                         {num + 1}
