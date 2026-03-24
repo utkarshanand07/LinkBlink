@@ -26,7 +26,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
                     <div>
                         <h1 className="text-3xl font-extrabold text-black tracking-tight mb-1 flex items-center gap-3">
-                            <span className="text-3xl">🛡️</span> Super Admin
+                            Admin Panel
                         </h1>
                         <p className="text-sm font-medium text-gray-500 mt-2">
                             Manage users, inspect platform links, and run cleanup operations.

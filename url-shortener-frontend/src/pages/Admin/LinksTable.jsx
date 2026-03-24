@@ -5,12 +5,16 @@ import { FaTrash, FaChevronLeft, FaChevronRight, FaEraser } from 'react-icons/fa
 import { toast } from 'react-hot-toast';
 import dayjs from 'dayjs';
 import Loader from '../../components/Loader';
+import ConfirmModal from '../../components/ConfirmModal'; // <-- Adjust path if needed
 
 const LinksTable = () => {
     const { token } = useStoreContext();
     const [page, setPage] = useState(0);
     const size = 10;
     const [selectedIds, setSelectedIds] = useState([]);
+
+    // Modal State
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: 'Confirm', isDanger: true });
 
     const { data: linksData, isLoading } = useFetchAllLinks(token, page, size, () => toast.error("Failed to fetch links"));
     const bulkDeleteMutation = useBulkDeleteLinks(token);
@@ -21,22 +25,38 @@ const LinksTable = () => {
     const isFirst = linksData?.first || false;
     const isLast = linksData?.last || false;
 
+    // Helper to open modal
+    const openModal = (title, message, onConfirm, confirmText = "Delete") => {
+        setModalConfig({ isOpen: true, title, message, onConfirm, confirmText, isDanger: true });
+    };
+    const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
+
     const handleToggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
     const handleSelectAll = () => setSelectedIds(links.map(l => l.id));
     const handleDeselectAll = () => setSelectedIds([]);
 
     const handleBulkDelete = () => {
-        if (window.confirm(`Delete ${selectedIds.length} selected links permanently?`)) {
-            bulkDeleteMutation.mutate(selectedIds, {
-                onSuccess: () => { toast.success("Links deleted"); setSelectedIds([]); }
-            });
-        }
+        openModal(
+            "Delete Selected Links",
+            `Are you sure you want to permanently delete these ${selectedIds.length} links? This action cannot be undone.`,
+            () => {
+                bulkDeleteMutation.mutate(selectedIds, {
+                    onSuccess: () => { toast.success("Links deleted"); setSelectedIds([]); }
+                });
+            },
+            "Delete Links"
+        );
     };
 
-    const handleClearClicks = (linkId) => {
-        if (window.confirm("Wipe all click history for this link? This resets the count to 0.")) {
-            clearClicksMutation.mutate(linkId, { onSuccess: () => toast.success("Analytics cleared") });
-        }
+    const handleClearClicks = (linkId, shortUrl) => {
+        openModal(
+            "Clear Analytics",
+            `Wipe all click tracking data for the short link '/s/${shortUrl}'? This will reset the click count to 0.`,
+            () => {
+                clearClicksMutation.mutate(linkId, { onSuccess: () => toast.success("Analytics cleared") });
+            },
+            "Clear Analytics"
+        );
     };
 
     const getPageNumbers = () => {
@@ -101,19 +121,19 @@ const LinksTable = () => {
                                     <td className="px-6 py-5 text-sm font-bold text-blue-600 whitespace-nowrap">{link.shortUrl}</td>
                                     <td className="px-6 py-5 text-sm font-medium text-gray-500 truncate max-w-[250px]" title={link.originalUrl}>{link.originalUrl}</td>
                                     <td className="px-6 py-5 text-sm text-center font-bold text-gray-700 whitespace-nowrap">
-                                        <span className="bg-gray-100 px-3 py-1 rounded-lg">{link.clickCount}</span>
+                                        <span className="bg-gray-100 px-3 py-1 rounded-lg border border-gray-200">{link.clickCount}</span>
                                     </td>
                                     <td className="px-6 py-5 text-sm font-medium text-gray-500 whitespace-nowrap">
                                         {link.expiresAt ? dayjs(link.expiresAt).format("MMM DD, YYYY") : "Never"}
                                     </td>
-                                    <td className="px-6 py-5 whitespace-nowrap">
-                                        <div className="flex justify-end opacity-80 group-hover:opacity-100 transition-opacity">
+                                    <td className="px-6 py-5 whitespace-nowrap flex justify-end">
+                                        <div className="opacity-80 group-hover:opacity-100 transition-opacity">
                                             <button 
-                                                onClick={() => handleClearClicks(link.id)}
+                                                onClick={() => handleClearClicks(link.id, link.shortUrl)}
                                                 className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-orange-600 rounded-lg transition-colors text-xs font-bold shadow-sm"
-                                                title="Wipe Analytics"
+                                                title="Wipe Analytics for this link"
                                             >
-                                                <FaEraser className="text-sm" /> Wipe Clicks
+                                                <FaEraser className="text-sm" /> Clear Analytics
                                             </button>
                                         </div>
                                     </td>
@@ -145,6 +165,17 @@ const LinksTable = () => {
                     </div>
                 )}
             </div>
+
+            {/* Reusable Confirmation Modal */}
+            <ConfirmModal 
+                isOpen={modalConfig.isOpen}
+                onClose={closeModal}
+                onConfirm={modalConfig.onConfirm}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                confirmText={modalConfig.confirmText}
+                isDanger={modalConfig.isDanger}
+            />
         </div>
     );
 };

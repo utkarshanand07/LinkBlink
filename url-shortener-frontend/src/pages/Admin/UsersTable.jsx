@@ -10,12 +10,16 @@ import {
 import { FaTrash, FaChevronLeft, FaChevronRight, FaLink, FaEraser } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import Loader from '../../components/Loader';
+import ConfirmModal from '../../components/ConfirmModal'; // <-- Adjust path if needed
 
 const UsersTable = () => {
     const { token } = useStoreContext();
     const [page, setPage] = useState(0);
     const size = 10;
     const [selectedIds, setSelectedIds] = useState([]);
+
+    // Modal State
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: 'Confirm', isDanger: true });
 
     const { data: usersData, isLoading } = useFetchAllUsers(token, page, size, () => toast.error("Failed to fetch users"));
     const changeRoleMutation = useChangeUserRole(token);
@@ -28,35 +32,68 @@ const UsersTable = () => {
     const isFirst = usersData?.first || false;
     const isLast = usersData?.last || false;
 
+    // Helper to open modal
+    const openModal = (title, message, onConfirm, confirmText = "Delete", isDanger = true) => {
+        setModalConfig({ isOpen: true, title, message, onConfirm, confirmText, isDanger });
+    };
+    const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
+
     const handleToggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
     const handleSelectAll = () => setSelectedIds(users.map(u => u.id));
     const handleDeselectAll = () => setSelectedIds([]);
 
-    const handleRoleChange = (userId, newRole) => {
-        changeRoleMutation.mutate({ userId, newRole }, {
-            onSuccess: () => toast.success("Role updated successfully"),
-            onError: (error) => toast.error(error.response?.data?.error || "Failed to update role")
-        });
+    const handleRoleChange = (userId, newRole, currentRole, username) => {
+        // Strip out the "ROLE_" prefix for a cleaner UI message
+        const displayCurrentRole = currentRole.replace("ROLE_", "");
+        const displayNewRole = newRole.replace("ROLE_", "");
+
+        openModal(
+            "Change User Role",
+            `Are you sure you want to change ${username}'s role from ${displayCurrentRole} to ${displayNewRole}?`,
+            () => {
+                changeRoleMutation.mutate({ userId, newRole }, {
+                    onSuccess: () => toast.success("Role updated successfully"),
+                    onError: (error) => toast.error(error.response?.data?.error || "Failed to update role")
+                });
+            },
+            "Update Role",
+            false // Not a danger action, button will be black
+        );
     };
 
     const handleBulkDelete = () => {
-        if (window.confirm(`Are you sure you want to permanently delete ${selectedIds.length} users AND all their links?`)) {
-            bulkDeleteMutation.mutate(selectedIds, {
-                onSuccess: () => { toast.success("Users deleted"); setSelectedIds([]); }
-            });
-        }
+        openModal(
+            "Delete Multiple Users",
+            `Are you sure you want to permanently delete ${selectedIds.length} users AND all of their associated links and analytics? This cannot be undone.`,
+            () => {
+                bulkDeleteMutation.mutate(selectedIds, {
+                    onSuccess: () => { toast.success("Users deleted"); setSelectedIds([]); }
+                });
+            },
+            "Delete Users"
+        );
     };
 
     const handleClearLinks = (userId, username) => {
-        if (window.confirm(`Permanently delete ALL links created by ${username}?`)) {
-            clearLinksMutation.mutate(userId, { onSuccess: () => toast.success(`Links for ${username} deleted.`) });
-        }
+        openModal(
+            "Delete All Links",
+            `Permanently delete ALL short links created by ${username}? This will also wipe all analytics for those links.`,
+            () => {
+                clearLinksMutation.mutate(userId, { onSuccess: () => toast.success(`Links for ${username} deleted.`) });
+            },
+            "Delete Links"
+        );
     };
 
     const handleClearClicks = (userId, username) => {
-        if (window.confirm(`Wipe all click analytics for ALL links owned by ${username}?`)) {
-            clearClicksMutation.mutate(userId, { onSuccess: () => toast.success(`Analytics wiped for ${username}.`) });
-        }
+        openModal(
+            "Clear All Analytics",
+            `Wipe all click tracking data for ALL links owned by ${username}? This resets their click counts to 0.`,
+            () => {
+                clearClicksMutation.mutate(userId, { onSuccess: () => toast.success(`Analytics wiped for ${username}.`) });
+            },
+            "Clear Analytics"
+        );
     };
 
     const getPageNumbers = () => {
@@ -121,7 +158,8 @@ const UsersTable = () => {
                                     <td className="px-6 py-5 text-sm font-medium text-gray-500 whitespace-nowrap">{user.email}</td>
                                     <td className="px-6 py-5 whitespace-nowrap">
                                         <select 
-                                            value={user.role} onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                            value={user.role} 
+                                            onChange={(e) => handleRoleChange(user.id, e.target.value, user.role, user.username)}
                                             className="text-sm font-semibold border border-gray-200 rounded-xl px-4 py-2 bg-gray-50 text-gray-700 focus:outline-none focus:border-black focus:ring-1 focus:ring-black cursor-pointer shadow-sm hover:bg-white transition-colors"
                                         >
                                             <option value="ROLE_BASIC">Basic</option>
@@ -176,6 +214,17 @@ const UsersTable = () => {
                     </div>
                 )}
             </div>
+
+            {/* Reusable Confirmation Modal */}
+            <ConfirmModal 
+                isOpen={modalConfig.isOpen}
+                onClose={closeModal}
+                onConfirm={modalConfig.onConfirm}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                confirmText={modalConfig.confirmText}
+                isDanger={modalConfig.isDanger}
+            />
         </div>
     );
 };
