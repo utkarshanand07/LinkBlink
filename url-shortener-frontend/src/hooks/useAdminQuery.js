@@ -32,10 +32,10 @@ export const useFetchAllLinks = (token, page, size, onError) => {
 export const useChangeUserRole = (token) => {
     const queryClient = useQueryClient();
     return useMutation(
-        async ({ userId, newRole }) => {
-            return await api.put(`/api/admin/users/${userId}/role`, { role: newRole }, {
-                headers: { Authorization: "Bearer " + token },
-            });
+        async ({ userId, newRole, durationDays }) => {
+            return await api.put(`/api/admin/users/${userId}/role`, 
+            { role: newRole, durationDays },
+            { headers: { Authorization: "Bearer " + token } });
         },
         { onSuccess: () => queryClient.invalidateQueries("admin-users") }
     );
@@ -126,5 +126,21 @@ export const useClearUserLinks = (token) => {
             });
         },
         { onSuccess: () => queryClient.invalidateQueries("admin-links") }
+    );
+};
+
+// Manual Trigger for Expired Role Demotion
+export const useVerifyExpiredRoles = (token) => {
+    const queryClient = useQueryClient();
+    return useMutation(
+        async () => {
+            return await api.post(`/api/admin/roles/verify`, {}, {
+                headers: { Authorization: "Bearer " + token },
+            });
+        },
+        { 
+            // Invalidate users so the table updates if someone was demoted
+            onSuccess: () => queryClient.invalidateQueries("admin-users") 
+        }
     );
 };

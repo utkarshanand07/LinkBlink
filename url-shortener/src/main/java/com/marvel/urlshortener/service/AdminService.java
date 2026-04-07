@@ -35,7 +35,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void changeUserRole(Long userId, String newRole) {
+    public void changeUserRole(Long userId, String newRole, Integer durationDays) {
         if ("ROLE_GUEST".equals(newRole)) {
             throw new RuntimeException("Cannot assign GUEST role to a registered user.");
         }
@@ -46,6 +46,16 @@ public class AdminService {
         try {
             Tier tier = Tier.valueOf(newRole);
             user.setRole(tier.name());
+
+            // Handle Expiration Logic
+            if ("ROLE_BASIC".equals(newRole)) {
+                user.setTierExpiresAt(null); // Basic is forever
+            } else if (durationDays != null && durationDays > 0) {
+                user.setTierExpiresAt(LocalDateTime.now().plusDays(durationDays));
+            } else {
+                user.setTierExpiresAt(null); // Null means infinite (Lifetime Pro/Admin)
+            }
+
             userRepository.save(user);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid role provided.");
@@ -176,6 +186,24 @@ public class AdminService {
         );
     }
 
+    // --- SUBSCRIPTION MAINTENANCE ---
+
+    @Transactional
+    public int demoteExpiredUsers() {
+        // Find users whose tier has expired
+        // Requires: List<User> findByTierExpiresAtBefore(LocalDateTime time); in UserRepository
+        List<User> expiredUsers = userRepository.findByTierExpiresAtBefore(LocalDateTime.now());
+
+        if (!expiredUsers.isEmpty()) {
+            for (User user : expiredUsers) {
+                user.setRole("ROLE_BASIC"); // Fallback tier
+                user.setTierExpiresAt(null); // Wipe expiration so they stay basic forever
+            }
+            userRepository.saveAll(expiredUsers);
+        }
+        return expiredUsers.size();
+    }
+
     // --- HELPERS ---
 
     private UserDTO convertToUserDTO(User user) {
@@ -184,6 +212,7 @@ public class AdminService {
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
         dto.setRole(user.getRole());
+        dto.setTierExpiresAt(user.getTierExpiresAt());
         return dto;
     }
 

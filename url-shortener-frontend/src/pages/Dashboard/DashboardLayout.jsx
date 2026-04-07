@@ -1,41 +1,44 @@
 import React, { useState } from 'react';
 import Graph from './Graph';
 import { useStoreContext } from '../../contextApi/ContextApi';
-import { useFetchMyShortUrls, useFetchTotalClicks } from '../../hooks/useQuery';
+import { useFetchMyShortUrls, useFetchTotalClicks, useFetchCurrentUser } from '../../hooks/useQuery'; 
 import ShortenPopUp from './ShortenPopUp';
-import { FaLink, FaPlus } from 'react-icons/fa';
+import { FaLink, FaPlus, FaCrown } from 'react-icons/fa'; 
 import ShortenUrlList from './ShortenUrlList';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Loader from '../../components/Loader';
+import dayjs from 'dayjs';
 
 const DashboardLayout = () => {
     const { token } = useStoreContext();
     const navigate = useNavigate();
     const [shortenPopUp, setShortenPopUp] = useState(false);
     
-    // Pagination State
     const [page, setPage] = useState(0);
     const size = 10;
 
-    function onError() {
-      navigate("/error");
-    }
+    function onError() { navigate("/error"); }
 
     const { isLoading, data: myShortenUrlsData, refetch } = useFetchMyShortUrls(token, page, size, onError);
     const { isLoading: loader, data: totalClicks } = useFetchTotalClicks(token, onError);
+    
+    const { data: userProfile } = useFetchCurrentUser(token, () => console.log("Failed to fetch profile"));
 
-    // Check if we have URLs inside the Spring Boot 'content' array
     const hasUrls = myShortenUrlsData?.content && myShortenUrlsData.content.length > 0;
+    
+    const displayRole = userProfile?.role ? userProfile.role.replace('ROLE_', '') : 'BASIC';
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-gray-100 flex flex-col pb-20">
         {loader ? ( 
             <Loader />
         ): ( 
-        <div className="max-w-7xl w-full mx-auto px-6 lg:px-16 pt-12">
+        <div className="max-w-7xl w-full mx-auto px-6 lg:px-16 pt-8">
             
             {/* Dashboard Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pt-4">
+                
+                {/* Left Side: Title */}
                 <div>
                     <h1 className="text-3xl font-extrabold text-black tracking-tight mb-1">
                         Analytics Overview
@@ -45,14 +48,46 @@ const DashboardLayout = () => {
                     </p>
                 </div>
                 
-                {/* Primary Action Button */}
-                <button
-                    className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-3.5 rounded-lg font-medium transition-colors duration-200 shadow-lg shadow-gray-200/50 w-full sm:w-auto justify-center"
-                    onClick={() => setShortenPopUp(true)}
-                >
-                    <FaPlus className="text-sm" />
-                    <span>Create Link</span>
-                </button>
+                {/* Right Side: Redesigned Plan Badge & Action Button */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+                    
+                    {/* NEW: STACKED PLAN BOX */}
+                    {userProfile && (
+                        <div className="flex items-center gap-3 bg-white border border-gray-200 px-5 py-3 rounded-2xl shadow-sm">
+                            <div className={`p-2.5 rounded-xl ${displayRole === 'BASIC' ? 'bg-gray-100 text-gray-400' : 'bg-yellow-50 text-yellow-500'}`}>
+                                <FaCrown className="text-xl" />
+                            </div>
+                            
+                            <div className="flex flex-col pr-2">
+                                <span className="text-sm font-extrabold text-black uppercase tracking-wide">
+                                    {displayRole} PLAN
+                                </span>
+                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
+                                    {displayRole === 'BASIC' || displayRole === 'ADMIN' || !userProfile.tierExpiresAt
+                                        ? "Lifetime Access" 
+                                        : `Expires ${dayjs(userProfile.tierExpiresAt).format("MMM DD, YYYY")}`
+                                    }
+                                </span>
+                            </div>
+                            
+                            {displayRole === 'BASIC' && (
+                                <Link to="/pricing" className="ml-2 pl-4 border-l border-gray-100">
+                                    <button className="text-xs font-bold text-white bg-black px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors shadow-md hover:-translate-y-0.5">
+                                        Upgrade
+                                    </button>
+                                </Link>
+                            )}
+                        </div>
+                    )}
+
+                    <button
+                        className="flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-4 rounded-2xl font-bold transition-all duration-200 shadow-lg shadow-gray-300/50 whitespace-nowrap hover:-translate-y-0.5"
+                        onClick={() => setShortenPopUp(true)}
+                    >
+                        <FaPlus className="text-sm" />
+                        <span>Create Link</span>
+                    </button>
+                </div>
             </div>
 
             {/* Graph Card Section */}
@@ -82,7 +117,6 @@ const DashboardLayout = () => {
                 {isLoading ? (
                     <Loader />
                 ) : !hasUrls ? (
-                    /* Premium Empty State */
                     <div className="flex flex-col items-center justify-center py-20 px-6 border-2 border-dashed border-gray-300 rounded-2xl bg-white mt-6">
                         <div className="bg-gray-100 p-4 rounded-full mb-4">
                             <FaLink className="text-gray-400 text-2xl" />
@@ -97,7 +131,7 @@ const DashboardLayout = () => {
                         </p>
                         {page === 0 && (
                             <button
-                                className="bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-black px-6 py-2.5 rounded-lg font-medium transition-colors duration-200"
+                                className="bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-black px-6 py-2.5 rounded-lg font-bold transition-colors duration-200"
                                 onClick={() => setShortenPopUp(true)}
                             >
                                 Create your first link

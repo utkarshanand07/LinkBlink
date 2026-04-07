@@ -9,8 +9,10 @@ import {
 } from '../../hooks/useAdminQuery';
 import { FaTrash, FaChevronLeft, FaChevronRight, FaLink, FaEraser } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import dayjs from 'dayjs';
 import Loader from '../../components/Loader';
-import ConfirmModal from '../../components/ConfirmModal'; // <-- Adjust path if needed
+import ConfirmModal from '../../components/ConfirmModal';
+import RoleDurationModal from '../../components/RoleDurationModal';
 
 const UsersTable = () => {
     const { token } = useStoreContext();
@@ -18,8 +20,11 @@ const UsersTable = () => {
     const size = 10;
     const [selectedIds, setSelectedIds] = useState([]);
 
-    // Modal State
+    // Generic Confirm Modal State
     const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: 'Confirm', isDanger: true });
+    
+    // NEW: Duration Modal State
+    const [durationConfig, setDurationConfig] = useState({ isOpen: false, userId: null, newRole: '', username: '' });
 
     const { data: usersData, isLoading } = useFetchAllUsers(token, page, size, () => toast.error("Failed to fetch users"));
     const changeRoleMutation = useChangeUserRole(token);
@@ -32,68 +37,60 @@ const UsersTable = () => {
     const isFirst = usersData?.first || false;
     const isLast = usersData?.last || false;
 
-    // Helper to open modal
-    const openModal = (title, message, onConfirm, confirmText = "Delete", isDanger = true) => {
-        setModalConfig({ isOpen: true, title, message, onConfirm, confirmText, isDanger });
-    };
+    const openModal = (title, message, onConfirm, confirmText = "Delete", isDanger = true) => setModalConfig({ isOpen: true, title, message, onConfirm, confirmText, isDanger });
     const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
 
     const handleToggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
     const handleSelectAll = () => setSelectedIds(users.map(u => u.id));
     const handleDeselectAll = () => setSelectedIds([]);
 
+    // --- REFINED ROLE CHANGE LOGIC ---
     const handleRoleChange = (userId, newRole, currentRole, username) => {
-        // Strip out the "ROLE_" prefix for a cleaner UI message
-        const displayCurrentRole = currentRole.replace("ROLE_", "");
-        const displayNewRole = newRole.replace("ROLE_", "");
-
-        openModal(
-            "Change User Role",
-            `Are you sure you want to change ${username}'s role from ${displayCurrentRole} to ${displayNewRole}?`,
-            () => {
-                changeRoleMutation.mutate({ userId, newRole }, {
-                    onSuccess: () => toast.success("Role updated successfully"),
-                    onError: (error) => toast.error(error.response?.data?.error || "Failed to update role")
-                });
-            },
-            "Update Role",
-            false // Not a danger action, button will be black
-        );
+        // If downgrading to Basic, or making them an Admin, we don't need a duration.
+        if (newRole === "ROLE_BASIC" || newRole === "ROLE_ADMIN") {
+            openModal(
+                "Change User Role",
+                `Change ${username}'s role from ${currentRole} to ${newRole} permanently?`,
+                () => {
+                    changeRoleMutation.mutate({ userId, newRole, durationDays: null }, {
+                        onSuccess: () => toast.success("Role updated successfully"),
+                        onError: (error) => toast.error(error.response?.data?.error || "Failed to update role")
+                    });
+                },
+                "Update Role",
+                false 
+            );
+        } else {
+            // If upgrading to PRO or ENTERPRISE, open the Subscription Duration Modal
+            setDurationConfig({ isOpen: true, userId, newRole, username });
+        }
     };
 
+    // Fired when the Admin clicks "Confirm Upgrade" on the new Duration Modal
+    const handleDurationConfirm = (durationDays) => {
+        changeRoleMutation.mutate({ userId: durationConfig.userId, newRole: durationConfig.newRole, durationDays }, {
+            onSuccess: () => toast.success(`Subscription upgraded for ${durationDays ? durationDays + " days" : "Lifetime"}`),
+            onError: (error) => toast.error(error.response?.data?.error || "Failed to update role")
+        });
+    };
+    // ---------------------------------
+
     const handleBulkDelete = () => {
-        openModal(
-            "Delete Multiple Users",
-            `Are you sure you want to permanently delete ${selectedIds.length} users AND all of their associated links and analytics? This cannot be undone.`,
-            () => {
-                bulkDeleteMutation.mutate(selectedIds, {
-                    onSuccess: () => { toast.success("Users deleted"); setSelectedIds([]); }
-                });
-            },
-            "Delete Users"
-        );
+        openModal("Delete Multiple Users", `Are you sure you want to permanently delete ${selectedIds.length} users AND all of their associated links and analytics?`, () => {
+            bulkDeleteMutation.mutate(selectedIds, { onSuccess: () => { toast.success("Users deleted"); setSelectedIds([]); }});
+        }, "Delete Users");
     };
 
     const handleClearLinks = (userId, username) => {
-        openModal(
-            "Delete All Links",
-            `Permanently delete ALL short links created by ${username}? This will also wipe all analytics for those links.`,
-            () => {
-                clearLinksMutation.mutate(userId, { onSuccess: () => toast.success(`Links for ${username} deleted.`) });
-            },
-            "Delete Links"
-        );
+        openModal("Delete All Links", `Permanently delete ALL short links created by ${username}? This will also wipe analytics.`, () => {
+            clearLinksMutation.mutate(userId, { onSuccess: () => toast.success(`Links for ${username} deleted.`) });
+        }, "Delete Links");
     };
 
     const handleClearClicks = (userId, username) => {
-        openModal(
-            "Clear All Analytics",
-            `Wipe all click tracking data for ALL links owned by ${username}? This resets their click counts to 0.`,
-            () => {
-                clearClicksMutation.mutate(userId, { onSuccess: () => toast.success(`Analytics wiped for ${username}.`) });
-            },
-            "Clear Analytics"
-        );
+        openModal("Clear All Analytics", `Wipe all click tracking data for ALL links owned by ${username}?`, () => {
+            clearClicksMutation.mutate(userId, { onSuccess: () => toast.success(`Analytics wiped for ${username}.`) });
+        }, "Clear Analytics");
     };
 
     const getPageNumbers = () => {
@@ -133,7 +130,7 @@ const UsersTable = () => {
             {/* Table Card */}
             <div className="bg-white border border-gray-200 shadow-sm rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-250">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-200">
                                 <th className="px-6 py-5 w-12 text-center"></th>
@@ -141,6 +138,7 @@ const UsersTable = () => {
                                 <th className="px-6 py-5 font-bold">Username</th>
                                 <th className="px-6 py-5 font-bold">Email</th>
                                 <th className="px-6 py-5 font-bold">Tier / Role</th>
+                                <th className="px-6 py-5 font-bold">Plan Expiry</th>
                                 <th className="px-6 py-5 font-bold text-right">Actions</th>
                             </tr>
                         </thead>
@@ -168,21 +166,35 @@ const UsersTable = () => {
                                             <option value="ROLE_ADMIN">Admin</option>
                                         </select>
                                     </td>
+                                    
+                                    {/* EXPIRY COLUMN */}
+                                    <td className="px-6 py-5 whitespace-nowrap">
+                                        {user.role === "ROLE_BASIC" || user.role === "ROLE_ADMIN" ? (
+                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Lifetime</span>
+                                        ) : user.tierExpiresAt ? (
+                                            <span className={`text-sm font-bold ${dayjs().isAfter(dayjs(user.tierExpiresAt)) ? 'text-red-500' : 'text-gray-700'}`}>
+                                                {dayjs(user.tierExpiresAt).format("MMM DD, YYYY")}
+                                            </span>
+                                        ) : (
+                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Lifetime</span>
+                                        )}
+                                    </td>
+
                                     <td className="px-6 py-5 whitespace-nowrap">
                                         <div className="flex justify-end gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
                                             <button 
                                                 onClick={() => handleClearClicks(user.id, user.username)}
                                                 className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-orange-600 rounded-lg transition-colors text-xs font-bold shadow-sm"
-                                                title="Wipe Analytics for all links"
+                                                title="Reset click counts and wipe analytics history"
                                             >
-                                                <FaEraser className="text-sm" /> Wipe Data
+                                                <FaEraser className="text-sm" /> Clear Analytics
                                             </button>
                                             <button 
                                                 onClick={() => handleClearLinks(user.id, user.username)}
                                                 className="flex items-center gap-1.5 px-3 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-lg transition-colors text-xs font-bold shadow-sm"
-                                                title="Delete all links"
+                                                title="Permanently delete all links"
                                             >
-                                                <FaLink className="text-sm" /> Clear Links
+                                                <FaTrash className="text-sm" /> Delete All Links
                                             </button>
                                         </div>
                                     </td>
@@ -200,7 +212,7 @@ const UsersTable = () => {
                             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={isFirst} className={`flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors ${isFirst ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-transparent' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm'}`}>
                                 <FaChevronLeft className="text-xs mr-2" /> Previous
                             </button>
-                            <div className="flex items-center gap-1 sm:flex">
+                            <div className="flex items-center gap-1 hidden sm:flex">
                                 {getPageNumbers().map((num, i) => num === '...' ? <span key={`ell-${i}`} className="px-2 text-gray-400">...</span> : (
                                     <button key={num} onClick={() => setPage(num)} className={`w-10 h-10 flex items-center justify-center text-sm font-bold rounded-xl transition-colors ${page === num ? 'bg-black text-white shadow-md' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm'}`}>
                                         {num + 1}
@@ -215,15 +227,18 @@ const UsersTable = () => {
                 )}
             </div>
 
-            {/* Reusable Confirmation Modal */}
+            {/* Modals */}
             <ConfirmModal 
-                isOpen={modalConfig.isOpen}
-                onClose={closeModal}
-                onConfirm={modalConfig.onConfirm}
-                title={modalConfig.title}
-                message={modalConfig.message}
-                confirmText={modalConfig.confirmText}
-                isDanger={modalConfig.isDanger}
+                isOpen={modalConfig.isOpen} onClose={closeModal} onConfirm={modalConfig.onConfirm}
+                title={modalConfig.title} message={modalConfig.message} confirmText={modalConfig.confirmText} isDanger={modalConfig.isDanger}
+            />
+
+            <RoleDurationModal 
+                isOpen={durationConfig.isOpen}
+                onClose={() => setDurationConfig({ ...durationConfig, isOpen: false })}
+                onConfirm={handleDurationConfirm}
+                username={durationConfig.username}
+                newRole={durationConfig.newRole}
             />
         </div>
     );

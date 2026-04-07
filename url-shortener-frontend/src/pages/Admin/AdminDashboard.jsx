@@ -3,7 +3,7 @@ import { useStoreContext } from '../../contextApi/ContextApi';
 import { FaUsers, FaLink, FaDatabase, FaChartLine, FaCalendarDay, FaGhost } from 'react-icons/fa';
 import UsersTable from './UsersTable';
 import LinksTable from './LinksTable';
-import { useCleanupExpiredLinks, useFetchSystemMetrics } from '../../hooks/useAdminQuery';
+import { useCleanupExpiredLinks, useFetchSystemMetrics, useVerifyExpiredRoles } from '../../hooks/useAdminQuery';
 import { toast } from 'react-hot-toast';
 import Loader from '../../components/Loader';
 
@@ -13,7 +13,8 @@ const AdminDashboard = () => {
     
     const cleanupMutation = useCleanupExpiredLinks(token);
     
-    // Fetch Global Metrics
+    const verifyRolesMutation = useVerifyExpiredRoles(token);
+    
     const { data: metrics, isLoading: isMetricsLoading } = useFetchSystemMetrics(
         token, 
         () => toast.error("Failed to load platform metrics")
@@ -25,6 +26,12 @@ const AdminDashboard = () => {
             onError: () => toast.error("Cleanup failed.")
         });
     }
+    const handleVerifyRoles = () => {
+    verifyRolesMutation.mutate(null, {
+        onSuccess: (data) => toast.success(`Sync complete! ${data?.data?.demotedCount || 0} expired plans were demoted.`),
+        onError: () => toast.error("Failed to verify roles.")
+    });
+};
 
     return (
         <div className="min-h-[calc(100vh-80px)] bg-gray-100 flex flex-col pb-20">
@@ -126,23 +133,46 @@ const AdminDashboard = () => {
                             {/* --- MAINTENANCE SECTION --- */}
                             <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-6 sm:p-8">
                                 <h2 className="text-xl font-bold text-black tracking-tight mb-2">System Maintenance</h2>
-                                <p className="text-sm text-gray-500 font-medium mb-8 max-w-xl">
-                                    Force a manual database sweep to remove all URLs that have passed their expiration date. This frees up database storage and ensures system speed.
+                                <p className="text-sm text-gray-500 font-medium mb-8 max-w-2xl">
+                                    Run manual sweeps to keep the database optimized and ensure user subscriptions are strictly enforced.
                                 </p>
                                 
-                                <div className="p-6 border border-red-100 bg-red-50 rounded-xl inline-block w-full sm:w-auto">
-                                    <h3 className="text-red-800 font-bold mb-1">Garbage Collection</h3>
-                                    <p className="text-red-600 text-sm mb-4">Permanently deletes expired records.</p>
-                                    <button 
-                                        onClick={handleCleanup}
-                                        disabled={cleanupMutation.isLoading}
-                                        className="bg-red-600 text-white shadow-lg shadow-red-200/50 px-6 py-3 rounded-lg font-bold text-sm hover:bg-red-700 transition-colors w-full sm:w-auto"
-                                    >
-                                        {cleanupMutation.isLoading ? "Cleaning Database..." : "Run Expired Link Cleanup"}
-                                    </button>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* 1. Garbage Collection Box */}
+                                    <div className="p-6 border border-red-100 bg-red-50 rounded-xl flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="text-red-800 font-bold mb-1">Garbage Collection</h3>
+                                            <p className="text-red-600 text-sm mb-6 leading-relaxed">
+                                                Permanently deletes URLs that have passed their expiration date, freeing up database storage.
+                                            </p>
+                                        </div>
+                                        <button 
+                                            onClick={handleCleanup}
+                                            disabled={cleanupMutation.isLoading}
+                                            className="bg-red-600 text-white shadow-lg shadow-red-200/50 px-6 py-3 rounded-lg font-bold text-sm hover:bg-red-700 transition-colors w-full"
+                                        >
+                                            {cleanupMutation.isLoading ? "Cleaning Database..." : "Run Link Cleanup"}
+                                        </button>
+                                    </div>
+
+                                    {/* 2. Role Verification Box */}
+                                    <div className="p-6 border border-purple-100 bg-purple-50 rounded-xl flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="text-purple-800 font-bold mb-1">Role Synchronization</h3>
+                                            <p className="text-purple-600 text-sm mb-6 leading-relaxed">
+                                                Scans all registered users. Anyone whose premium plan has passed its expiration date will be immediately demoted to Basic.
+                                            </p>
+                                        </div>
+                                        <button 
+                                            onClick={handleVerifyRoles}
+                                            disabled={verifyRolesMutation.isLoading}
+                                            className="bg-purple-600 text-white shadow-lg shadow-purple-200/50 px-6 py-3 rounded-lg font-bold text-sm hover:bg-purple-700 transition-colors w-full"
+                                        >
+                                            {verifyRolesMutation.isLoading ? "Verifying..." : "Verify Expired Plans"}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
                     )}
                 </div>

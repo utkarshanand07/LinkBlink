@@ -32,16 +32,33 @@ public class AdminController {
     }
 
     @PutMapping("/users/{userId}/role")
-    public ResponseEntity<Void> changeUserRole(@PathVariable Long userId, @RequestBody Map<String, String> request) {
-        String newRole = request.get("role");
-        adminService.changeUserRole(userId, newRole);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> changeUserRole(@PathVariable Long userId, @RequestBody Map<String, Object> request) {
+        String newRole = (String) request.get("role");
+        Integer durationDays = null;
+
+        // Extract duration if provided by the frontend
+        if (request.containsKey("durationDays") && request.get("durationDays") != null) {
+            durationDays = Integer.parseInt(request.get("durationDays").toString());
+        }
+
+        try {
+            adminService.changeUserRole(userId, newRole, durationDays);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/users/bulk")
     public ResponseEntity<Void> deleteUsers(@RequestBody Map<String, List<Long>> request) {
         adminService.deleteUsers(request.get("ids"));
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/roles/verify")
+    public ResponseEntity<Map<String, Integer>> verifyAndDemoteExpiredRoles() {
+        int demotedCount = adminService.demoteExpiredUsers();
+        return ResponseEntity.ok(Map.of("demotedCount", demotedCount));
     }
 
     // --- LINKS ---

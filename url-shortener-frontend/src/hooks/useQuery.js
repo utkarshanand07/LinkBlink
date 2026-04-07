@@ -57,3 +57,20 @@ export const useFetchTotalClicks = (token, onError) => {
         }
     );
 };
+
+export const useFetchCurrentUser = (token, onError) => {
+    return useQuery(
+        ["current-user", token],
+        async () => {
+            return await api.get(`/api/auth/users/me`, {
+                headers: { Accept: "application/json", Authorization: "Bearer " + token },
+            });
+        }, 
+        { 
+            select: (data) => data.data, 
+            onError, 
+            staleTime: 60000,
+            enabled: !!token
+        }
+    );
+};
