@@ -91,6 +91,18 @@ export const useCleanupExpiredLinks = (token) => {
     );
 };
 
+export const useFetchSystemMetrics = (token, onError) => {
+    return useQuery(
+        ["admin-metrics"],
+        async () => {
+            return await api.get(`/api/admin/metrics`, {
+                headers: { Accept: "application/json", Authorization: "Bearer " + token },
+            });
+        },
+        { select: (data) => data.data, onError, staleTime: 60000 } 
+    );
+};
+
 // NEW: Clear all clicks for a specific user
 export const useClearUserClicks = (token) => {
     const queryClient = useQueryClient();

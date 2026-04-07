@@ -2,6 +2,7 @@ package com.marvel.urlshortener.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -14,4 +15,6 @@ public class User {
     private String username;
     private String password;
     private String role = "ROLE_USER";
+    private LocalDateTime tierExpiresAt;
+    private boolean hasUsedFreeTrial = false;
 }

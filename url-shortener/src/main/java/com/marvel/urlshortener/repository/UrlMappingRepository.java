@@ -47,4 +47,10 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
     // Admin: Find all expired links for the cleanup job
     List<UrlMapping> findByExpiresAtBefore(LocalDateTime time);
+
+    // Admin: Get count of links created after a specific time (e.g., start of today)
+    long countByCreatedDateAfter(LocalDateTime date);
+
+    // Admin: Get count of links made by guests (where user is null)
+    long countByUserIsNull();
 }

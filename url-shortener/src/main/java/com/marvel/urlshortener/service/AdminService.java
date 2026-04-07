@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -153,6 +154,26 @@ public class AdminService {
             userLinks.forEach(link -> link.setClickCount(0));
             urlMappingRepository.saveAll(userLinks);
         }
+    }
+
+    @Transactional
+    public Map<String, Long> getPlatformMetrics() {
+        LocalDateTime startOfDay = java.time.LocalDate.now().atStartOfDay();
+
+        long totalUsers = userRepository.count();
+        long totalLinks = urlMappingRepository.count();
+        long guestLinks = urlMappingRepository.countByUserIsNull();
+        long linksToday = urlMappingRepository.countByCreatedDateAfter(startOfDay);
+        long totalClicks = clickEventRepository.count();
+
+        return Map.of(
+                "totalUsers", totalUsers,
+                "totalLinks", totalLinks,
+                "guestLinks", guestLinks,
+                "registeredLinks", (totalLinks - guestLinks),
+                "linksToday", linksToday,
+                "totalClicks", totalClicks
+        );
     }
 
     // --- HELPERS ---

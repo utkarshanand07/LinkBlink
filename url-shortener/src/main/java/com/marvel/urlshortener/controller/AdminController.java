@@ -88,6 +88,11 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("deletedCount", deletedCount));
     }
 
+    @GetMapping("/metrics")
+    public ResponseEntity<Map<String, Long>> getPlatformMetrics() {
+        return ResponseEntity.ok(adminService.getPlatformMetrics());
+    }
+
     // --- ANALYTICS ---
 
     @DeleteMapping("/links/{linkId}/clicks")
