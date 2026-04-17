@@ -17,4 +17,5 @@ public class User {
     private String role = "ROLE_USER";
     private LocalDateTime tierExpiresAt;
     private boolean hasUsedFreeTrial = false;
+    private boolean cancelAtPeriodEnd = false;
 }

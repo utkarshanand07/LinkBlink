@@ -12,6 +12,7 @@ import PrivateRoute from "./PrivateRoute";
 import ErrorPage from "./pages/ErrorPage";
 import AdminRoute from "./AdminRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import PricingPage from "./pages/PricingPage"; // <-- IMPORT NEW PAGE
 
 const AppRouter = () => {
   const location = useLocation();
@@ -25,6 +26,8 @@ const AppRouter = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/s/:url" element={<ShortenUrlPage />} />
+          
+          <Route path="/pricing" element={<PricingPage />} />
 
           <Route path="/register" element={<PrivateRoute publicPage={true}><RegisterPage /></PrivateRoute>} />
           <Route path="/login" element={<PrivateRoute publicPage={true}><LoginPage /></PrivateRoute>} />

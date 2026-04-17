@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import api from "../api/axiosApi";
 import dayjs from "dayjs";
 
@@ -71,6 +71,67 @@ export const useFetchCurrentUser = (token, onError) => {
             onError, 
             staleTime: 60000,
             enabled: !!token
+        }
+    );
+};
+
+// --- SUBSCRIPTION & MONETIZATION HOOKS ---
+
+// 1. Get the Proration / Cost Preview
+export const useFetchCheckoutPreview = (token, targetTier, billingCycle, enabled = false) => {
+    return useQuery(
+        ["checkout-preview", targetTier, billingCycle],
+        async () => {
+            return await api.get(`/api/subscriptions/preview?targetTier=${targetTier}&billingCycle=${billingCycle}`, {
+                headers: { Accept: "application/json", Authorization: "Bearer " + token },
+            });
+        },
+        { 
+            select: (data) => data.data,
+            enabled: enabled && !!token, // Only fetch when the modal is open
+            staleTime: 0 // Always fetch fresh math
+        }
+    );
+};
+
+// 2. Process the Upgrade/Extension
+export const useProcessCheckout = (token) => {
+    const queryClient = useQueryClient();
+    return useMutation(
+        async ({ targetTier, billingCycle }) => {
+            return await api.post(`/api/subscriptions/checkout`, 
+                { targetTier, billingCycle },
+                { headers: { Authorization: "Bearer " + token } }
+            );
+        },
+        { 
+            // Invalidate current user so the Dashboard badge updates instantly!
+            onSuccess: () => queryClient.invalidateQueries(["current-user", token]) 
+        }
+    );
+};
+
+// 3. Cancel Subscription (Downgrade flag)
+export const useCancelSubscription = (token) => {
+    const queryClient = useQueryClient();
+    return useMutation(
+        async () => {
+            return await api.post(`/api/subscriptions/cancel`, {}, {
+                headers: { Authorization: "Bearer " + token },
+            });
+        },
+        { onSuccess: () => queryClient.invalidateQueries(["current-user", token]) }
+    );
+};
+
+// 4. Contact Enterprise Sales
+export const useSubmitEnterpriseContact = (token) => {
+    return useMutation(
+        async ({ companyName, expectedLinks }) => {
+            return await api.post(`/api/subscriptions/enterprise-contact`, 
+                { companyName, expectedLinks },
+                { headers: { Authorization: "Bearer " + token } }
+            );
         }
     );
 };

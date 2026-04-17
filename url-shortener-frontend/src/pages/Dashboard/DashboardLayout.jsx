@@ -5,14 +5,18 @@ import { useFetchMyShortUrls, useFetchTotalClicks, useFetchCurrentUser } from '.
 import ShortenPopUp from './ShortenPopUp';
 import { FaLink, FaPlus, FaCrown } from 'react-icons/fa'; 
 import ShortenUrlList from './ShortenUrlList';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
 import dayjs from 'dayjs';
+import ManageBillingModal from '../../components/ManageBillingModal';
 
 const DashboardLayout = () => {
     const { token } = useStoreContext();
     const navigate = useNavigate();
     const [shortenPopUp, setShortenPopUp] = useState(false);
+    
+    // Billing Modal State
+    const [billingModalOpen, setBillingModalOpen] = useState(false);
     
     const [page, setPage] = useState(0);
     const size = 10;
@@ -48,40 +52,36 @@ const DashboardLayout = () => {
                     </p>
                 </div>
                 
-                {/* Right Side: Redesigned Plan Badge & Action Button */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+                {/* Right Side: Equal & Sleek Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                     
-                    {/* NEW: STACKED PLAN BOX */}
+                    {/* PLAN BADGE BUTTON */}
                     {userProfile && (
-                        <div className="flex items-center gap-3 bg-white border border-gray-200 px-5 py-3 rounded-2xl shadow-sm">
-                            <div className={`p-2.5 rounded-xl ${displayRole === 'BASIC' ? 'bg-gray-100 text-gray-400' : 'bg-yellow-50 text-yellow-500'}`}>
-                                <FaCrown className="text-xl" />
+                        <button 
+                            onClick={() => setBillingModalOpen(true)}
+                            className="flex items-center gap-3 bg-white border border-gray-200 px-5 h-14 rounded-2xl shadow-sm hover:border-gray-300 hover:shadow-md transition-all text-left group w-full sm:w-auto"
+                        >
+                            <div className={`p-2 rounded-xl transition-colors ${displayRole === 'BASIC' ? 'bg-gray-100 text-gray-400 group-hover:text-black' : 'bg-yellow-50 text-yellow-500 group-hover:bg-yellow-100'}`}>
+                                <FaCrown className="text-lg" />
                             </div>
                             
-                            <div className="flex flex-col pr-2">
-                                <span className="text-sm font-extrabold text-black uppercase tracking-wide">
+                            <div className="flex flex-col pr-1">
+                                <span className="text-[13px] font-extrabold text-black uppercase tracking-wide leading-tight">
                                     {displayRole} PLAN
                                 </span>
-                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-tight mt-0.5">
                                     {displayRole === 'BASIC' || displayRole === 'ADMIN' || !userProfile.tierExpiresAt
                                         ? "Lifetime Access" 
-                                        : `Expires ${dayjs(userProfile.tierExpiresAt).format("MMM DD, YYYY")}`
+                                        : `Expires ${dayjs(userProfile.tierExpiresAt).format("MMM DD, YY")}`
                                     }
                                 </span>
                             </div>
-                            
-                            {displayRole === 'BASIC' && (
-                                <Link to="/pricing" className="ml-2 pl-4 border-l border-gray-100">
-                                    <button className="text-xs font-bold text-white bg-black px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors shadow-md hover:-translate-y-0.5">
-                                        Upgrade
-                                    </button>
-                                </Link>
-                            )}
-                        </div>
+                        </button>
                     )}
 
+                    {/* CREATE LINK BUTTON */}
                     <button
-                        className="flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-4 rounded-2xl font-bold transition-all duration-200 shadow-lg shadow-gray-300/50 whitespace-nowrap hover:-translate-y-0.5"
+                        className="flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white px-8 h-14 rounded-2xl font-bold transition-all duration-200 shadow-lg shadow-gray-300/50 whitespace-nowrap hover:-translate-y-0.5 w-full sm:w-auto"
                         onClick={() => setShortenPopUp(true)}
                     >
                         <FaPlus className="text-sm" />
@@ -154,6 +154,13 @@ const DashboardLayout = () => {
           refetch={refetch}
           open={shortenPopUp}
           setOpen={setShortenPopUp}
+        />
+
+        {/* Render Billing Modal */}
+        <ManageBillingModal 
+            isOpen={billingModalOpen}
+            onClose={() => setBillingModalOpen(false)}
+            userProfile={userProfile}
         />
     </div>
   )

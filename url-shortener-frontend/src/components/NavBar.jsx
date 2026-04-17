@@ -71,6 +71,18 @@ const Navbar = () => {
             </li>
           )}
 
+          <li>
+            <Link
+              className={`text-sm font-medium transition-colors duration-200 ${
+                path === "/pricing" ? "text-black" : "text-gray-500 hover:text-black"
+              }`}
+              to="/pricing"
+              onClick={() => setNavbarOpen(false)}
+            >
+              Pricing
+            </Link>
+          </li>
+
           {/* NEW: Admin Button strictly visible to Admins */}
           {isAdmin && (
             <li>
