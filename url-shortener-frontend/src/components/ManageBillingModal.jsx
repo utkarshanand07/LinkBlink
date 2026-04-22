@@ -31,41 +31,41 @@ const ManageBillingModal = ({ isOpen, onClose, userProfile }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl transform transition-all relative">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-900/80 backdrop-blur-sm transition-opacity">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 w-full max-w-md shadow-premium dark:shadow-glass-dark border border-slate-200 dark:border-slate-700 transform transition-all relative animate-fade-in">
                 
                 <button 
                     onClick={() => { setConfirmCancel(false); onClose(); }} 
-                    className="absolute top-5 right-5 p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors z-10"
+                    className="absolute top-6 right-6 p-2.5 text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors z-10"
                 >
                     <RxCross2 className="text-xl" />
                 </button>
 
-                <h2 className="text-2xl font-extrabold text-black tracking-tight mb-6">Manage Plan</h2>
+                <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-6">Manage Plan</h2>
 
                 {/* Current Plan Card */}
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-6">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className={`p-2.5 rounded-xl ${isBasic ? 'bg-gray-200 text-gray-500' : 'bg-yellow-100 text-yellow-600'}`}>
+                <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-6 mb-8">
+                    <div className="flex items-center gap-4 mb-5">
+                        <div className={`p-3 rounded-xl ${isBasic ? 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400' : 'bg-yellow-100 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'}`}>
                             <FaCrown className="text-xl" />
                         </div>
                         <div>
-                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-0.5">Current Plan</span>
-                            <span className="text-lg font-extrabold text-black">{displayRole}</span>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1">Current Plan</span>
+                            <span className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{displayRole}</span>
                         </div>
                     </div>
                     
-                    <div className="border-t border-gray-200 pt-4 flex justify-between items-center">
-                        <span className="text-sm font-medium text-gray-500">Status</span>
-                        <span className="text-sm font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                    <div className="border-t border-slate-200 dark:border-slate-800 pt-5 flex justify-between items-center">
+                        <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Status</span>
+                        <span className="text-xs font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-500/10 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-500/20 uppercase tracking-wider">
                             Active
                         </span>
                     </div>
                     
                     {!isBasic && displayRole !== 'ADMIN' && (
-                        <div className="border-t border-gray-200 pt-4 mt-4 flex justify-between items-center">
-                            <span className="text-sm font-medium text-gray-500">Renews / Expires on</span>
-                            <span className="text-sm font-bold text-black">
+                        <div className="border-t border-slate-200 dark:border-slate-800 pt-4 mt-4 flex justify-between items-center">
+                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Renews / Expires on</span>
+                            <span className="text-sm font-bold text-slate-900 dark:text-white">
                                 {userProfile.tierExpiresAt ? dayjs(userProfile.tierExpiresAt).format("MMM DD, YYYY") : "Lifetime"}
                             </span>
                         </div>
@@ -77,40 +77,40 @@ const ManageBillingModal = ({ isOpen, onClose, userProfile }) => {
                     <div className="space-y-3">
                         <button
                             onClick={() => { onClose(); navigate("/pricing"); }}
-                            className="w-full py-3.5 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-colors shadow-md"
+                            className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-md active:scale-95"
                         >
-                            {isBasic ? "Upgrade Plan" : "Extend / Upgrade Plan"}
+                            {isBasic ? "Upgrade Plan" : "Upgrade Plan"}
                         </button>
                         
                         {!isBasic && displayRole !== 'ADMIN' && (
                             <button
                                 onClick={() => setConfirmCancel(true)}
-                                className="w-full py-3.5 bg-white border border-gray-200 text-red-600 font-bold rounded-xl hover:bg-red-50 hover:border-red-100 transition-colors"
+                                className="w-full py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-red-600 dark:text-red-400 font-semibold rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 hover:border-red-200 dark:hover:border-red-900/30 transition-colors active:scale-95"
                             >
                                 Cancel Subscription
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className="p-5 bg-red-50 border border-red-100 rounded-2xl animate-fade-in">
-                        <div className="flex items-center gap-2 mb-3 text-red-600">
-                            <FaExclamationTriangle />
-                            <span className="font-bold">Are you sure?</span>
+                    <div className="p-6 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl animate-fade-in">
+                        <div className="flex items-center gap-2 mb-3 text-red-600 dark:text-red-400">
+                            <FaExclamationTriangle className="text-lg" />
+                            <span className="font-extrabold tracking-tight text-lg">Are you sure?</span>
                         </div>
-                        <p className="text-sm text-red-800 mb-5">
+                        <p className="text-sm text-red-800 dark:text-red-300/80 mb-6 font-medium leading-relaxed">
                             If you cancel, you will keep your {displayRole} features until the end of your current billing period. After that, your account will be downgraded to Basic.
                         </p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setConfirmCancel(false)}
-                                className="flex-1 py-2.5 bg-white text-gray-700 font-bold rounded-xl border border-gray-200 hover:bg-gray-50"
+                                className="flex-1 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
                             >
                                 Go Back
                             </button>
                             <button
                                 onClick={handleCancel}
                                 disabled={cancelMutation.isLoading}
-                                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl shadow-md hover:bg-red-700 disabled:opacity-70"
+                                className="flex-1 py-3 bg-red-600 text-white font-semibold rounded-xl shadow-md hover:bg-red-700 active:scale-95 disabled:opacity-70 transition-all"
                             >
                                 {cancelMutation.isLoading ? "Canceling..." : "Yes, Cancel"}
                             </button>

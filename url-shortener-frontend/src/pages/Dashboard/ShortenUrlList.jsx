@@ -3,7 +3,8 @@ import ShortenItem from './ShortenItem';
 import api from '../../api/axiosApi';
 import { useStoreContext } from '../../contextApi/ContextApi';
 import { FaTrash, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import ConfirmModal from './ConfirmModal';
+// UPDATED IMPORT: Pointing to the global ConfirmModal
+import ConfirmModal from '../../components/ConfirmModal';
 
 const ShortenUrlList = ({ data, refetch, currentPage, setPage }) => {
     const { token } = useStoreContext();
@@ -47,17 +48,17 @@ const ShortenUrlList = ({ data, refetch, currentPage, setPage }) => {
         {/* Solid Bulk Action Bar */}
         {selectedIds.length > 0 && (
             <div className="bg-white dark:bg-slate-900 p-5 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm transition-all duration-300">
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                     {selectedIds.length} item(s) selected
                 </span>
                 <div className="flex flex-wrap gap-3">
-                    <button onClick={handleSelectAll} className="px-5 py-2.5 text-sm font-bold border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl transition-all">
+                    <button onClick={handleSelectAll} className="px-5 py-2.5 text-sm font-semibold border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl transition-all">
                         Select All
                     </button>
-                    <button onClick={handleDeselectAll} className="px-5 py-2.5 text-sm font-bold border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl transition-all">
+                    <button onClick={handleDeselectAll} className="px-5 py-2.5 text-sm font-semibold border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl transition-all">
                         Deselect All
                     </button>
-                    <button onClick={() => setIsBulkDeleteModalOpen(true)} className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md active:scale-95">
+                    <button onClick={() => setIsBulkDeleteModalOpen(true)} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md active:scale-95">
                         <FaTrash /> Delete
                     </button>
                 </div>
@@ -80,7 +81,7 @@ const ShortenUrlList = ({ data, refetch, currentPage, setPage }) => {
                 <div className="flex items-center gap-2">
                     <button 
                         onClick={() => setPage(prev => Math.max(0, prev - 1))} disabled={isFirst}
-                        className={`flex items-center justify-center p-2 sm:px-4 sm:py-2.5 text-sm font-bold rounded-xl transition-all ${isFirst ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm active:scale-95'}`}
+                        className={`flex items-center justify-center p-2 sm:px-4 sm:py-2.5 text-sm font-semibold rounded-xl transition-all ${isFirst ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm active:scale-95'}`}
                     >
                         <FaChevronLeft className="text-xs sm:mr-2" /> <span className="hidden sm:inline">Previous</span>
                     </button>
@@ -88,11 +89,11 @@ const ShortenUrlList = ({ data, refetch, currentPage, setPage }) => {
                     <div className="flex items-center gap-1.5">
                         {getPageNumbers().map((pageNumber, index) => (
                             pageNumber === '...' ? (
-                                <span key={`ellipsis-${index}`} className="px-2 text-slate-400 dark:text-slate-500 font-bold">...</span>
+                                <span key={`ellipsis-${index}`} className="px-2 text-slate-400 dark:text-slate-500 font-semibold">...</span>
                             ) : (
                                 <button
                                     key={pageNumber} onClick={() => setPage(pageNumber)}
-                                    className={`w-10 h-10 flex items-center justify-center text-sm font-bold rounded-xl transition-all ${currentPage === pageNumber ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95'}`}
+                                    className={`w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-xl transition-all ${currentPage === pageNumber ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95'}`}
                                 >
                                     {pageNumber + 1}
                                 </button>
@@ -102,7 +103,7 @@ const ShortenUrlList = ({ data, refetch, currentPage, setPage }) => {
                     
                     <button 
                         onClick={() => setPage(prev => prev + 1)} disabled={isLast}
-                        className={`flex items-center justify-center p-2 sm:px-4 sm:py-2.5 text-sm font-bold rounded-xl transition-all ${isLast ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm active:scale-95'}`}
+                        className={`flex items-center justify-center p-2 sm:px-4 sm:py-2.5 text-sm font-semibold rounded-xl transition-all ${isLast ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm active:scale-95'}`}
                     >
                         <span className="hidden sm:inline">Next</span> <FaChevronRight className="text-xs sm:ml-2" />
                     </button>
@@ -110,7 +111,15 @@ const ShortenUrlList = ({ data, refetch, currentPage, setPage }) => {
             </div>
         )}
 
-        <ConfirmModal isOpen={isBulkDeleteModalOpen} onClose={() => setIsBulkDeleteModalOpen(false)} onConfirm={handleBulkDelete} title="Delete Multiple URLs" message={`Permanently delete these ${selectedIds.length} URLs?`} />
+        {/* UPDATED: Passing confirmText to the general modal */}
+        <ConfirmModal 
+            isOpen={isBulkDeleteModalOpen} 
+            onClose={() => setIsBulkDeleteModalOpen(false)} 
+            onConfirm={handleBulkDelete} 
+            title="Delete Multiple URLs" 
+            message={`Permanently delete these ${selectedIds.length} URLs?`} 
+            confirmText="Delete"
+        />
     </div>
   )
 }

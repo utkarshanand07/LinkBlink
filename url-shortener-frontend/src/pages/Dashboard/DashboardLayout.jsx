@@ -37,7 +37,7 @@ const DashboardLayout = () => {
             {/* Dashboard Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pt-4">
                 <div>
-                    <h1 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                    <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
                         Analytics Overview
                     </h1>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -56,10 +56,10 @@ const DashboardLayout = () => {
                                 <FaCrown className="text-lg" />
                             </div>
                             <div className="flex flex-col pr-1">
-                                <span className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-wide leading-tight">
+                                <span className="text-[13px] font-bold text-slate-900 dark:text-white uppercase tracking-wide leading-tight">
                                     {displayRole} PLAN
                                 </span>
-                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-tight mt-0.5">
+                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-tight mt-0.5">
                                     {displayRole === 'BASIC' || displayRole === 'ADMIN' || !userProfile.tierExpiresAt
                                         ? "Lifetime Access" 
                                         : `Expires ${dayjs(userProfile.tierExpiresAt).format("MMM DD, YY")}`
@@ -70,7 +70,7 @@ const DashboardLayout = () => {
                     )}
 
                     <button
-                        className="flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 h-14 rounded-2xl font-bold transition-all duration-200 shadow-md hover:scale-95 w-full sm:w-auto"
+                        className="flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 h-14 rounded-2xl font-semibold transition-all duration-200 shadow-md hover:scale-95 w-full sm:w-auto"
                         onClick={() => setShortenPopUp(true)}
                     >
                         <FaPlus className="text-sm" />
@@ -83,7 +83,7 @@ const DashboardLayout = () => {
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm rounded-[2rem] p-6 sm:p-8 mb-16 relative h-100 w-full transition-all duration-300">
                 {(!totalClicks || totalClicks.length === 0) && (
                     <div className="absolute inset-0 flex flex-col justify-center items-center bg-white/90 dark:bg-slate-900/90 z-10 rounded-[2rem]">
-                        <h1 className="text-slate-900 dark:text-white text-xl font-black tracking-tight mb-2">
+                        <h1 className="text-slate-900 dark:text-white text-xl font-bold tracking-tight mb-2">
                             No data for this time period.
                         </h1>
                         <h3 className="text-center text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm">
@@ -96,7 +96,7 @@ const DashboardLayout = () => {
 
             {/* URL List Section */}
             <div className="mt-8">
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
                     Your Links
                 </h2>
                 <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-8">
@@ -110,7 +110,7 @@ const DashboardLayout = () => {
                         <div className="bg-slate-100 dark:bg-slate-800 p-5 rounded-full mb-6">
                             <FaLink className="text-slate-400 dark:text-slate-400 text-3xl" />
                         </div>
-                        <h1 className="text-slate-900 dark:text-white text-xl font-black tracking-tight mb-3">
+                        <h1 className="text-slate-900 dark:text-white text-xl font-bold tracking-tight mb-3">
                             No links found
                         </h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 text-center max-w-md">
@@ -120,7 +120,7 @@ const DashboardLayout = () => {
                         </p>
                         {page === 0 && (
                             <button
-                                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-8 py-3.5 rounded-xl font-bold transition-all duration-200 active:scale-95"
+                                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-200 active:scale-95"
                                 onClick={() => setShortenPopUp(true)}
                             >
                                 Create your first link
