@@ -93,6 +93,7 @@ public class UrlMappingService {
         return shortUrl.toString();
     }
 
+    @Transactional
     public Page<UrlMappingDTO> getUrlsByUser(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
 
