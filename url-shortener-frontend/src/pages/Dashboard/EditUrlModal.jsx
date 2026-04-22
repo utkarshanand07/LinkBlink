@@ -12,32 +12,32 @@ const EditUrlModal = ({ isOpen, onClose, onConfirm, currentOriginalUrl }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all">
-                <h2 className="text-xl font-bold text-black tracking-tight mb-2">
-                    Edit Link Destination
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-900/80 backdrop-blur-sm transition-opacity">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 w-full max-w-md shadow-premium dark:shadow-glass-dark border border-slate-200 dark:border-slate-700 transform transition-all animate-fade-in">
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                    Edit Destination
                 </h2>
-                <p className="text-sm font-medium text-gray-500 mb-6">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-8">
                     Update where your shortened URL redirects to.
                 </p>
                 
-                <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-8">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-widest ml-1">
                         Original URL
                     </label>
                     <input 
                         type="url"
                         value={newUrl}
                         onChange={(e) => setNewUrl(e.target.value)}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all text-sm"
+                        className="w-full px-5 py-3.5 bg-slate-50 dark:bg-brand-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-900 dark:focus:ring-slate-100 outline-none transition-all text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                         placeholder="https://example.com"
                     />
                 </div>
 
-                <div className="flex justify-end gap-3">
+                <div className="flex justify-end gap-3 w-full sm:w-auto">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2.5 text-sm font-medium text-black bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                        className="flex-1 sm:flex-none px-6 py-3.5 text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
                     >
                         Cancel
                     </button>
@@ -47,7 +47,7 @@ const EditUrlModal = ({ isOpen, onClose, onConfirm, currentOriginalUrl }) => {
                             onClose();
                         }}
                         disabled={!newUrl || newUrl === currentOriginalUrl}
-                        className="px-4 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-gray-200/50"
+                        className="flex-1 sm:flex-none px-6 py-3.5 text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                     >
                         Save Changes
                     </button>

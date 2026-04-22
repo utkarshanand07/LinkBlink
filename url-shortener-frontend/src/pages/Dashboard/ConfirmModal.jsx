@@ -4,18 +4,18 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all">
-                <h2 className="text-xl font-bold text-black tracking-tight mb-2">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-900/80 backdrop-blur-sm transition-opacity">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 w-full max-w-md shadow-premium dark:shadow-glass-dark border border-slate-200 dark:border-slate-700 transform transition-all animate-fade-in">
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-3">
                     {title}
                 </h2>
-                <p className="text-sm font-medium text-gray-500 mb-6">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
                     {message}
                 </p>
-                <div className="flex justify-end gap-3">
+                <div className="flex justify-end gap-3 w-full sm:w-auto">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2.5 text-sm font-medium text-black bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                        className="flex-1 sm:flex-none px-6 py-3.5 text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
                     >
                         Cancel
                     </button>
@@ -24,7 +24,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
                             onConfirm();
                             onClose();
                         }}
-                        className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-200/50"
+                        className="flex-1 sm:flex-none px-6 py-3.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-500/20 active:scale-95"
                     >
                         Delete
                     </button>
