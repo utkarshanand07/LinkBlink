@@ -99,7 +99,7 @@ const PricingPage = () => {
                         { title: 'Enterprise', price: `$${enterprisePricing.monthly}`, sub: 'For heavy volume.', perks: ['10,000 Short Links', 'Lifetime Expiration', 'Advanced Analytics', 'Custom Aliases'], color: 'bg-white', text: 'text-slate-900', btn: 'bg-slate-900 text-white', pricing: enterprisePricing },
                         { title: 'Custom', price: 'Contact', sub: 'For large teams.', perks: ['Unlimited Links', 'Dedicated Support', 'Custom SLA', 'Custom Domains'], color: 'bg-slate-50', text: 'text-slate-900', btn: 'bg-white border border-slate-200 text-slate-700' }
                     ].map((plan, i) => (
-                        <div key={i} className={`${plan.color} ${plan.text} rounded-[2rem] p-8 border border-slate-200/60 shadow-sm flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden`}>
+                        <div key={i} className={`${plan.color} ${plan.text} rounded-4xl p-8 border border-slate-200/60 shadow-sm flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden`}>
                             {plan.featured && <div className="absolute top-0 right-0 bg-yellow-400 text-black font-black text-[9px] px-6 py-1 transform rotate-45 translate-x-6 translate-y-2 uppercase tracking-widest">Best</div>}
                             
                             <h3 className="text-xl font-extrabold mb-1">{plan.title}</h3>

@@ -17,52 +17,46 @@ const LoginPage = () => {
         reset,
         formState: {errors}
     } = useForm({
-        defaultValues: {
-            username: "",
-            email: "",
-            password: "",
-        },
+        defaultValues: { username: "", email: "", password: "" },
         mode: "onTouched",
     });
 
     const loginHandler = async (data) => {
         setLoader(true);
         try {
-            const { data: response } = await api.post(
-                "/api/auth/public/login",
-                data
-            );
-            console.log(response.token);
+            const { data: response } = await api.post("/api/auth/public/login", data);
             setToken(response.token);
             localStorage.setItem("JWT_TOKEN", JSON.stringify(response.token));
             toast.success("Login Successful!");
             reset();
             navigate("/dashboard");
         } catch (error) {
-            console.log(error);
-            toast.error("Login Failed!")
+            toast.error("Login Failed!");
         } finally {
             setLoader(false);
         }
     };
 
   return (
-    <div className='min-h-[calc(100vh-80px)] bg-gray-50 flex justify-center items-center px-4'>
+    <div className='min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-brand-950 transition-colors duration-300 flex justify-center items-center px-4 relative overflow-hidden'>
         
+        {/* Subtle Background Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 dark:bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+
         <form 
             onSubmit={handleSubmit(loginHandler)}
-            className="w-full max-w-md bg-white border border-gray-100 shadow-xl shadow-gray-200/40 py-10 px-8 rounded-2xl"
+            className="w-full max-w-md bg-white/80 dark:bg-brand-900/50 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 shadow-premium dark:shadow-glass-dark py-12 px-8 sm:px-10 rounded-[2rem] z-10 transition-all duration-300"
         >
-            <div className="text-center mb-8">
-                <h1 className="font-extrabold text-black text-3xl tracking-tight mb-2">
+            <div className="text-center mb-10">
+                <h1 className="font-black text-slate-900 dark:text-white text-3xl tracking-tight mb-2">
                     Welcome back.
                 </h1>
-                <p className="text-gray-500 text-sm font-medium">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
                     Enter your details to access your links.
                 </p>
             </div>
 
-            <div className="flex flex-col gap-5 mb-8">
+            <div className="flex flex-col gap-6 mb-8">
                 <TextField
                     label="Username"
                     required
@@ -90,17 +84,17 @@ const LoginPage = () => {
             <button
                 disabled={loader}
                 type='submit'
-                className={`w-full py-3.5 bg-black text-white font-medium rounded-lg transition-all duration-200 ${
-                    loader ? "opacity-70 cursor-not-allowed" : "hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-300"
+                className={`w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl tracking-wide transition-all duration-200 shadow-lg shadow-black/5 dark:shadow-white/5 active:scale-95 ${
+                    loader ? "opacity-70 cursor-not-allowed" : "hover:bg-slate-800 dark:hover:bg-slate-100"
                 }`}
             >
                 {loader ? "Logging in..." : "Log in"}
             </button>
 
-            <p className='text-center text-sm text-gray-500 mt-8 font-medium'>
+            <p className='text-center text-sm text-slate-500 dark:text-slate-400 mt-8 font-medium'>
                 Don't have an account?{" "}
                 <Link
-                    className='text-black font-bold hover:underline transition-all'
+                    className='text-slate-900 dark:text-white font-bold hover:underline transition-all'
                     to="/register"
                 >
                     Sign up

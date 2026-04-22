@@ -16,8 +16,6 @@ const GuestShortenBox = () => {
     const [shortenedUrl, setShortenedUrl] = useState(null);
     const [shortCode, setShortCode] = useState("");
     const [isCopied, setIsCopied] = useState(false);
-    
-    // QR Code Panel States
     const [showQrPanel, setShowQrPanel] = useState(false);
     const [customText, setCustomText] = useState("");
 
@@ -64,7 +62,6 @@ const GuestShortenBox = () => {
 
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-
         const padding = 24;
         const qrSize = qrCanvas.width;
         const textSpace = customText.trim() ? 40 : 0;
@@ -108,51 +105,50 @@ const GuestShortenBox = () => {
                         key="input-form"
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                         onSubmit={handleSubmit(onSubmit)} 
-                        className="bg-white p-2 sm:p-3 rounded-2xl shadow-2xl shadow-black/5 border border-gray-100 flex flex-col sm:flex-row gap-3 w-full max-w-3xl"
+                        className="bg-white/80 dark:bg-brand-900/50 backdrop-blur-xl p-2.5 rounded-[2rem] shadow-premium dark:shadow-glass-dark border border-slate-200/60 dark:border-slate-800/60 flex flex-col sm:flex-row gap-3 w-full max-w-3xl relative z-10 transition-all duration-300"
                     >
                         <div className="flex-1 relative">
                             <input 
                                 type="url" 
                                 placeholder="Paste your long link here..." 
-                                className={`w-full h-full min-h-[56px] px-5 bg-gray-50 rounded-xl outline-none border focus:border-black focus:ring-1 focus:ring-black transition-all text-gray-800 ${errors.originalUrl ? 'border-red-400' : 'border-transparent'}`}
+                                className={`w-full h-full min-h-[60px] px-6 bg-slate-50 dark:bg-brand-950 rounded-3xl outline-none border focus:border-slate-900 dark:focus:border-slate-100 focus:ring-1 focus:ring-slate-900 dark:focus:ring-slate-100 transition-all text-slate-900 dark:text-white font-medium placeholder-slate-400 dark:placeholder-slate-500 ${errors.originalUrl ? 'border-red-400 dark:border-red-500' : 'border-transparent'}`}
                                 {...register("originalUrl", { required: "Please enter a URL" })}
                             />
-                            {errors.originalUrl && <span className="absolute -bottom-6 left-2 text-xs text-red-500 font-medium">{errors.originalUrl.message}</span>}
+                            {errors.originalUrl && <span className="absolute -bottom-6 left-4 text-xs text-red-500 dark:text-red-400 font-bold">{errors.originalUrl.message}</span>}
                         </div>
                         <button 
                             type="submit" 
                             disabled={loading}
-                            className={`w-full sm:w-auto px-8 py-4 bg-black text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-black/10 ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-gray-800 hover:-translate-y-0.5"}`}
+                            className={`w-full sm:w-auto px-10 py-4 min-h-[60px] bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black tracking-wide uppercase text-sm rounded-3xl transition-all duration-200 shadow-lg shadow-black/5 dark:shadow-white/5 active:scale-95 ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-slate-800 dark:hover:bg-slate-100 hover:-translate-y-0.5"}`}
                         >
                             {loading ? "Shortening..." : "Shorten Now"}
                         </button>
                     </motion.form>
 
                 ) : (
-
                     // --- SUCCESS RESULT BOX ---
                     <motion.div 
                         key="result-box"
                         layout 
                         initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl shadow-black/10 border border-gray-100 flex flex-col items-center text-center relative overflow-hidden w-full max-w-2xl"
+                        className="bg-white/80 dark:bg-brand-900/50 backdrop-blur-xl p-8 rounded-[2rem] shadow-premium dark:shadow-glass-dark border border-slate-200/60 dark:border-slate-800/60 flex flex-col items-center text-center relative overflow-hidden w-full max-w-2xl transition-all duration-300"
                     >
                         {!token && (
-                            <div className="absolute top-0 left-0 w-full bg-orange-50 text-orange-600 text-xs font-bold py-1.5 uppercase tracking-widest">
+                            <div className="absolute top-0 left-0 w-full bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-black py-1.5 uppercase tracking-widest border-b border-orange-100 dark:border-orange-500/20">
                                 Guest Link • Expires in 7 Days
                             </div>
                         )}
 
-                        <h3 className="text-gray-500 font-medium text-sm mb-2 mt-4">Your shortened link is ready!</h3>
+                        <h3 className="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest mb-2 mt-4">Your shortened link is ready!</h3>
                         
-                        <a href={shortenedUrl} target="_blank" rel="noreferrer" className="text-2xl sm:text-3xl font-extrabold text-blue-600 hover:text-blue-700 transition-colors tracking-tight mb-8 break-all">
+                        <a href={shortenedUrl} target="_blank" rel="noreferrer" className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors tracking-tight mb-8 break-all">
                             {shortenedUrl.replace(/^https?:\/\//, "")}
                         </a>
 
                         {/* Primary Action Buttons */}
                         <div className="flex flex-col sm:flex-row w-full gap-3 max-w-lg">
                             <CopyToClipboard text={shortenedUrl} onCopy={handleCopy}>
-                                <button className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-all ${isCopied ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-black text-white hover:bg-gray-800 shadow-lg shadow-black/10'}`}>
+                                <button className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all active:scale-95 ${isCopied ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-500/20' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 shadow-lg shadow-black/5 dark:shadow-white/5'}`}>
                                     {isCopied ? <LiaCheckSolid className="text-xl" /> : <IoCopy className="text-xl" />}
                                     {isCopied ? "Copied!" : "Copy Link"}
                                 </button>
@@ -160,9 +156,9 @@ const GuestShortenBox = () => {
                             
                             <button 
                                 onClick={() => setShowQrPanel(!showQrPanel)} 
-                                className={`flex-1 flex items-center justify-center gap-2 py-3.5 border rounded-xl font-bold transition-all shadow-sm ${showQrPanel ? 'bg-gray-100 border-gray-200 text-gray-700' : 'bg-white border-gray-200 text-black hover:bg-gray-50 hover:border-gray-300'}`}
+                                className={`flex-1 flex items-center justify-center gap-2 py-4 border rounded-2xl font-bold transition-all shadow-sm active:scale-95 ${showQrPanel ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-brand-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-brand-900'}`}
                             >
-                                <FaQrcode className="text-lg" /> {showQrPanel ? "Hide QR Panel" : "Create QR Code"}
+                                <FaQrcode className="text-lg" /> {showQrPanel ? "Hide QR" : "Create QR"}
                             </button>
                         </div>
 
@@ -170,60 +166,59 @@ const GuestShortenBox = () => {
                         <AnimatePresence>
                             {showQrPanel && (
                                 <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
+                                    initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                                     className="w-full overflow-hidden"
                                 >
-                                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-6 pt-6 border-t border-gray-100 text-left">
+                                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-6 pt-6 border-t border-slate-200/60 dark:border-slate-800/60 text-left">
                                         
-                                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 shadow-inner shrink-0 flex flex-col items-center justify-center min-w-[180px]">
+                                        {/* EXPLICITLY WHITE BACKGROUND FOR QR CODE SCANNABILITY */}
+                                        <div className="bg-white p-4 rounded-[2rem] border border-slate-200 shadow-sm shrink-0 flex flex-col items-center justify-center min-w-[180px]">
                                             <QRCodeCanvas 
                                                 id="guest-qr-canvas"
                                                 value={shortenedUrl} 
                                                 size={140} 
                                                 level={"H"} 
                                                 includeMargin={false}
+                                                fgColor="#0f172a" // Deep slate instead of pure black for a softer look
                                             />
                                             {customText.trim() && (
-                                                <p className="mt-3 font-bold text-black text-xs text-center truncate w-full px-2 max-w-[140px]">
+                                                <p className="mt-3 font-bold text-slate-900 text-xs text-center truncate w-full px-2 max-w-[140px]">
                                                     {customText}
                                                 </p>
                                             )}
                                         </div>
                                         
                                         <div className="flex flex-col flex-1 w-full max-w-sm">
-                                            <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider ml-1">
+                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-widest ml-1">
                                                 Text Below QR (Optional)
                                             </label>
                                             <input 
                                                 type="text"
                                                 value={customText}
                                                 onChange={(e) => setCustomText(e.target.value)}
-                                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-black outline-none transition-all text-sm font-medium shadow-sm mb-4"
+                                                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-brand-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-1 focus:ring-slate-900 dark:focus:ring-slate-100 focus:border-slate-900 dark:focus:border-slate-100 outline-none transition-all text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 mb-4"
                                                 placeholder="Leave blank for no text"
                                                 maxLength={35}
                                             />
                                             <button 
                                                 onClick={downloadQRCode} 
-                                                className="w-full py-3.5 bg-black text-white rounded-xl font-bold text-sm shadow-lg shadow-black/10 hover:bg-gray-800 transition-colors"
+                                                className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm shadow-lg shadow-black/5 dark:shadow-white/5 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors active:scale-95"
                                             >
                                                 Download PNG Image
                                             </button>
                                         </div>
-
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        {/* Conspicuous Text-Link Reset Button */}
+                        {/* Reset Button */}
                         <button 
                             onClick={resetBox} 
-                            className="mt-8 group flex items-center justify-center gap-2 text-sm font-bold text-gray-500 hover:text-black transition-colors"
+                            className="mt-8 group flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                         >
                             <FaRedoAlt className="text-xs group-hover:-rotate-180 transition-transform duration-500" /> 
-                            <span className="border-b border-transparent group-hover:border-black transition-colors pb-0.5">
+                            <span className="border-b border-transparent group-hover:border-slate-900 dark:group-hover:border-white transition-colors pb-0.5">
                                 Shorten another link
                             </span>
                         </button>

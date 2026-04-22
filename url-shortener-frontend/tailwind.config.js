@@ -1,34 +1,47 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class', 
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      backgroundImage: {
-        "custom-gradient": "linear-gradient(to right, #3b82f6, #9333ea)", // equivalent to from-blue-500 to-purple-600
-        "custom-gradient-2": "linear-gradient(to left, #3b82f6, #f43f5e)",
-        "card-gradient": "linear-gradient(to right, #38b2ac, #4299e1)",
+      fontFamily: {
+        sans: ['Montserrat', 'system-ui', 'sans-serif'], 
       },
       colors: {
-        navbarColor: "#ffffff",
-        btnColor: "#3364F7",
-        linkColor: "#2a5bd7",
+        brand: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
+          950: '#020617',
+        }
       },
       boxShadow: {
-        custom: "0 0 15px rgba(0, 0, 0, 0.3)",
-        right: "10px 0px 10px -5px rgba(0, 0, 0, 0.3)",
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.05)',
+        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
+        'premium': '0 20px 40px -15px rgba(0,0,0,0.05)',
       },
-      fontFamily: {
-        roboto: ["Roboto", "sans-serif"],
-        montserrat: ["Montserrat"],
+      animation: {
+        'fade-in': 'fadeIn 0.2s ease-out forwards',
+        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
       },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(12px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        }
+      }
     },
   },
-
-  variants: {
-    extend: {
-      backgroundImage: ["responsive"],
-    },
-  },
-
   plugins: [],
 };

@@ -12,7 +12,7 @@ import PrivateRoute from "./PrivateRoute";
 import ErrorPage from "./pages/ErrorPage";
 import AdminRoute from "./AdminRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-import PricingPage from "./pages/PricingPage"; // <-- IMPORT NEW PAGE
+import PricingPage from "./pages/PricingPage";
 
 const AppRouter = () => {
   const location = useLocation();

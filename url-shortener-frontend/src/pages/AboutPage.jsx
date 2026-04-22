@@ -1,77 +1,54 @@
-import React from "react";
-import { FaLink, FaShareAlt, FaEdit, FaChartLine } from "react-icons/fa";
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const AboutPage = () => {
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-white py-16 lg:py-24">
-      <div className="max-w-6xl mx-auto px-6 lg:px-16">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-brand-950 transition-colors duration-300 relative overflow-hidden pb-24">
+      
+      {/* Background Aesthetic Orb */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-500/10 dark:bg-purple-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+      <div className="max-w-4xl mx-auto px-6 lg:px-16 pt-20 lg:pt-32 relative z-10">
         
-        {/* Header Section */}
-        <div className="max-w-3xl mb-20">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight mb-6">
-            About LinkBlink.
-          </h1>
-          <p className="text-lg text-gray-500 leading-relaxed font-medium">
-            We believe sharing information should be completely frictionless. LinkBlink is designed to transform long, cumbersome URLs into clean, manageable links in seconds, giving you total control over your digital presence.
-          </p>
+        {/* Header */}
+        <div className="text-center mb-20">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-block px-4 py-1.5 mb-6 text-[11px] font-bold tracking-[0.2em] uppercase bg-white dark:bg-brand-900 border border-slate-200/60 dark:border-slate-800 rounded-full text-slate-500 dark:text-slate-400 shadow-sm">
+              Our Mission
+          </motion.div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+            className="font-black text-slate-900 dark:text-white text-4xl md:text-6xl tracking-tight mb-6"
+          >
+            We simplify the internet.
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto"
+          >
+            Long, ugly URLs are terrible for branding and impossible to remember. We built LinkBlink to give creators, marketers, and enterprises the tools they need to share cleanly and track confidently.
+          </motion.p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
-          
-          {/* Feature 1 */}
-          <div className="flex flex-col items-start">
-            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-              <FaLink className="text-black text-2xl" />
+        {/* Glassmorphic Content Cards */}
+        <motion.div 
+            initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+            <div className="bg-white/80 dark:bg-brand-900/50 backdrop-blur-md p-8 rounded-[2rem] border border-slate-200/60 dark:border-slate-800/60 shadow-premium dark:shadow-glass-dark transition-all duration-300">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Precision Data</h3>
+                <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                    We believe data should be beautiful. Instead of overwhelming spreadsheets, we provide crisp, actionable graphs so you can see exactly where your audience is coming from.
+                </p>
             </div>
-            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
-              Simple Shortening
-            </h2>
-            <p className="text-gray-500 leading-relaxed">
-              Transform long URLs into short, memorable links instantly. Our streamlined interface gets you straight to the point without the clutter.
-            </p>
-          </div>
 
-          {/* Feature 2 */}
-          <div className="flex flex-col items-start">
-            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-              <FaShareAlt className="text-black text-2xl" />
+            <div className="bg-white/80 dark:bg-brand-900/50 backdrop-blur-md p-8 rounded-[2rem] border border-slate-200/60 dark:border-slate-800/60 shadow-premium dark:shadow-glass-dark transition-all duration-300">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Built to Scale</h3>
+                <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                    Whether you are shortening 10 links for a weekend project or 10,000 links for an enterprise marketing campaign, our infrastructure handles redirects in milliseconds.
+                </p>
             </div>
-            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
-              Powerful Analytics
-            </h2>
-            <p className="text-gray-500 leading-relaxed">
-              Gain deep insights into your link performance. Track clicks, geographic locations, and referrers to perfectly optimize your reach.
-            </p>
-          </div>
+        </motion.div>
 
-          {/* Feature 3 */}
-          <div className="flex flex-col items-start">
-            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-              <FaEdit className="text-black text-2xl" />
-            </div>
-            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
-              Enhanced Security
-            </h2>
-            <p className="text-gray-500 leading-relaxed">
-              Your data's safety is our priority. Every link is protected with industry-standard encryption and robust security protocols.
-            </p>
-          </div>
-
-          {/* Feature 4 */}
-          <div className="flex flex-col items-start">
-            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-              <FaChartLine className="text-black text-2xl" />
-            </div>
-            <h2 className="text-xl font-bold text-black tracking-tight mb-3">
-              Fast and Reliable
-            </h2>
-            <p className="text-gray-500 leading-relaxed">
-              Built for speed and high availability. Enjoy lightning-fast redirects and an infrastructure you can depend on, 24/7.
-            </p>
-          </div>
-
-        </div>
       </div>
     </div>
   );

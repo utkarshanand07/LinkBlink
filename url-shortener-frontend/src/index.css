@@ -1,7 +1,11 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @layer base {
-  body {
+  html, body, #root {
     font-family: 'Montserrat', sans-serif;
+    @apply bg-slate-50 text-slate-900 dark:bg-brand-950 dark:text-slate-100 transition-colors duration-300 ease-in-out;
   }
 }
