@@ -38,17 +38,17 @@ const LoginPage = () => {
     };
 
   return (
-    <div className='min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-brand-950 transition-colors duration-300 flex justify-center items-center px-4 relative overflow-hidden'>
+    <div className='min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950 transition-colors duration-300 flex justify-center items-center px-4 relative overflow-hidden'>
         
-        {/* Subtle Background Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 dark:bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+        {/* Enhanced Background Glow (Blue for Login) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/20 dark:bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
         <form 
             onSubmit={handleSubmit(loginHandler)}
-            className="w-full max-w-md bg-white/80 dark:bg-brand-900/50 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/60 shadow-premium dark:shadow-glass-dark py-12 px-8 sm:px-10 rounded-[2rem] z-10 transition-all duration-300"
+            className="w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-premium dark:shadow-glass-dark py-12 px-8 sm:px-10 rounded-[2rem] z-10 transition-all duration-300"
         >
             <div className="text-center mb-10">
-                <h1 className="font-black text-slate-900 dark:text-white text-3xl tracking-tight mb-2">
+                <h1 className="font-extrabold text-slate-900 dark:text-white text-3xl tracking-tight mb-2">
                     Welcome back.
                 </h1>
                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
@@ -84,7 +84,7 @@ const LoginPage = () => {
             <button
                 disabled={loader}
                 type='submit'
-                className={`w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl tracking-wide transition-all duration-200 shadow-lg shadow-black/5 dark:shadow-white/5 active:scale-95 ${
+                className={`w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl tracking-wide transition-all duration-200 shadow-md active:scale-95 ${
                     loader ? "opacity-70 cursor-not-allowed" : "hover:bg-slate-800 dark:hover:bg-slate-100"
                 }`}
             >

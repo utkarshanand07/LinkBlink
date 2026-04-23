@@ -5,8 +5,8 @@ const AboutPage = () => {
   return (
     <div className="min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-brand-950 transition-colors duration-300 relative overflow-hidden pb-24">
       
-      {/* Background Aesthetic Orb */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-500/10 dark:bg-purple-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+      {/* Background Aesthetic Orb - Matched to Pricing Page */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/10 dark:bg-blue-600/10 blur-[100px] rounded-full pointer-events-none"></div>
 
       <div className="max-w-4xl mx-auto px-6 lg:px-16 pt-20 lg:pt-32 relative z-10">
         
