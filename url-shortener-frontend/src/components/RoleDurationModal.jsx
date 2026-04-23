@@ -21,24 +21,22 @@ const RoleDurationModal = ({ isOpen, onClose, onConfirm, username, newRole }) =>
     ];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl transform transition-all relative">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-900/80 backdrop-blur-sm transition-opacity">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 w-full max-w-lg shadow-premium dark:shadow-glass-dark border border-slate-200 dark:border-slate-700 transform transition-all relative animate-fade-in">
                 
-                {/* FIXED: Adjusted positioning so it doesn't overlap */}
                 <button 
                     onClick={onClose}
-                    className="absolute top-5 right-5 p-2.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors z-10"
+                    className="absolute top-6 right-6 p-2.5 text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors z-10"
                 >
                     <RxCross2 className="text-xl" />
                 </button>
 
-                {/* FIXED: Added pr-12 to force text to wrap before hitting the button */}
                 <div className="mb-8 pr-12">
-                    <h2 className="text-2xl font-extrabold text-black tracking-tight mb-2">
+                    <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
                         Upgrade to {roleName}
                     </h2>
-                    <p className="text-sm font-medium text-gray-500 leading-relaxed">
-                        Select the subscription duration for <strong className="text-black">{username}</strong>. They will automatically be downgraded to Basic when this expires.
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Select the subscription duration for <strong className="text-slate-900 dark:text-white font-semibold">{username}</strong>. They will automatically be downgraded to Basic when this expires.
                     </p>
                 </div>
 
@@ -50,16 +48,16 @@ const RoleDurationModal = ({ isOpen, onClose, onConfirm, username, newRole }) =>
                             <button
                                 key={index}
                                 onClick={() => setSelectedDuration(duration.days)}
-                                className={`flex flex-col text-left p-4 rounded-xl border-2 transition-all duration-200 ${
+                                className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
                                     isSelected 
-                                    ? "border-black bg-gray-50 shadow-md" 
-                                    : "border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50"
+                                    ? "border-slate-900 dark:border-slate-100 bg-slate-50 dark:bg-slate-800 shadow-sm" 
+                                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900"
                                 } ${duration.days === null ? "sm:col-span-2" : ""}`}
                             >
-                                <span className={`font-bold text-base mb-1 ${isSelected ? "text-black" : "text-gray-700"}`}>
+                                <span className={`font-semibold text-base mb-1 ${isSelected ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
                                     {duration.label}
                                 </span>
-                                <span className={`text-xs font-medium ${isSelected ? "text-gray-600" : "text-gray-400"}`}>
+                                <span className={`text-xs font-medium ${isSelected ? "text-slate-600 dark:text-slate-400" : "text-slate-500 dark:text-slate-500"}`}>
                                     {duration.desc}
                                 </span>
                             </button>
@@ -67,11 +65,17 @@ const RoleDurationModal = ({ isOpen, onClose, onConfirm, username, newRole }) =>
                     })}
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                    <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-800 w-full sm:w-auto">
+                    <button 
+                        onClick={onClose} 
+                        className="flex-1 sm:flex-none px-6 py-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors active:scale-95"
+                    >
                         Cancel
                     </button>
-                    <button onClick={() => { onConfirm(selectedDuration); onClose(); }} className="px-8 py-3 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-800 transition-all shadow-lg shadow-black/10">
+                    <button 
+                        onClick={() => { onConfirm(selectedDuration); onClose(); }} 
+                        className="flex-1 sm:flex-none px-6 py-3.5 text-sm font-semibold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-md active:scale-95"
+                    >
                         Confirm Upgrade
                     </button>
                 </div>
