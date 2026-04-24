@@ -1,5 +1,6 @@
 package com.marvel.urlshortener.repository;
 
+import com.marvel.urlshortener.analytics.dto.StatTuple;
 import com.marvel.urlshortener.models.ClickEvent;
 import com.marvel.urlshortener.models.UrlMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -65,4 +66,43 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    // ==========================================================
+    // ADVANCED ANALYTICS: SINGLE URL
+    // ==========================================================
+
+    @Query("SELECT c.country AS label, COUNT(c) AS value FROM ClickEvent c WHERE c.urlMapping.id = :urlId AND c.country IS NOT NULL GROUP BY c.country ORDER BY value DESC")
+    List<StatTuple> getCountryStatsByUrl(@Param("urlId") Long urlId);
+
+    @Query("SELECT CAST(c.deviceType AS string) AS label, COUNT(c) AS value FROM ClickEvent c WHERE c.urlMapping.id = :urlId AND c.deviceType IS NOT NULL GROUP BY c.deviceType ORDER BY value DESC")
+    List<StatTuple> getDeviceStatsByUrl(@Param("urlId") Long urlId);
+
+    @Query("SELECT CAST(c.browser AS string) AS label, COUNT(c) AS value FROM ClickEvent c WHERE c.urlMapping.id = :urlId AND c.browser IS NOT NULL GROUP BY c.browser ORDER BY value DESC")
+    List<StatTuple> getBrowserStatsByUrl(@Param("urlId") Long urlId);
+
+    @Query("SELECT CAST(c.os AS string) AS label, COUNT(c) AS value FROM ClickEvent c WHERE c.urlMapping.id = :urlId AND c.os IS NOT NULL GROUP BY c.os ORDER BY value DESC")
+    List<StatTuple> getOsStatsByUrl(@Param("urlId") Long urlId);
+
+    @Query("SELECT c.referrer AS label, COUNT(c) AS value FROM ClickEvent c WHERE c.urlMapping.id = :urlId AND c.referrer IS NOT NULL GROUP BY c.referrer ORDER BY value DESC")
+    List<StatTuple> getReferrerStatsByUrl(@Param("urlId") Long urlId);
+
+
+    // ==========================================================
+    // ADVANCED ANALYTICS: TOTAL FOR USER
+    // ==========================================================
+
+    @Query("SELECT c.country AS label, COUNT(c) AS value FROM ClickEvent c JOIN c.urlMapping u WHERE u.user.id = :userId AND c.country IS NOT NULL GROUP BY c.country ORDER BY value DESC")
+    List<StatTuple> getCountryStatsByUser(@Param("userId") Long userId);
+
+    @Query("SELECT CAST(c.deviceType AS string) AS label, COUNT(c) AS value FROM ClickEvent c JOIN c.urlMapping u WHERE u.user.id = :userId AND c.deviceType IS NOT NULL GROUP BY c.deviceType ORDER BY value DESC")
+    List<StatTuple> getDeviceStatsByUser(@Param("userId") Long userId);
+
+    @Query("SELECT CAST(c.browser AS string) AS label, COUNT(c) AS value FROM ClickEvent c JOIN c.urlMapping u WHERE u.user.id = :userId AND c.browser IS NOT NULL GROUP BY c.browser ORDER BY value DESC")
+    List<StatTuple> getBrowserStatsByUser(@Param("userId") Long userId);
+
+    @Query("SELECT CAST(c.os AS string) AS label, COUNT(c) AS value FROM ClickEvent c JOIN c.urlMapping u WHERE u.user.id = :userId AND c.os IS NOT NULL GROUP BY c.os ORDER BY value DESC")
+    List<StatTuple> getOsStatsByUser(@Param("userId") Long userId);
+
+    @Query("SELECT c.referrer AS label, COUNT(c) AS value FROM ClickEvent c JOIN c.urlMapping u WHERE u.user.id = :userId AND c.referrer IS NOT NULL GROUP BY c.referrer ORDER BY value DESC")
+    List<StatTuple> getReferrerStatsByUser(@Param("userId") Long userId);
 }
