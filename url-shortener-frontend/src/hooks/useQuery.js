@@ -135,3 +135,51 @@ export const useSubmitEnterpriseContact = (token) => {
         }
     );
 };
+
+// ==================================================
+// ADVANCED ANALYTICS HOOKS
+// ==================================================
+
+// 1. Fetch Total Advanced Analytics (For Main Dashboard)
+export const useFetchAdvancedAnalyticsTotal = (token, enabled = true) => {
+    return useQuery(
+        ["advanced-analytics-total", token],
+        async () => {
+            return await api.get(`/api/analytics/advanced/total`, {
+                headers: {
+                    Accept: "application/json",
+                    Authorization: "Bearer " + token,
+                },
+            });
+        },
+        {
+            select: (data) => data.data,
+            // Only fire if the user has Enterprise access AND the tab requires it
+            enabled: enabled && !!token,
+            staleTime: 60000, // Cache for 1 minute so switching tabs is instant
+            retry: false, // Don't retry if it fails (e.g., 403 or 503)
+        }
+    );
+};
+
+// 2. Fetch Single URL Advanced Analytics (For Link Details)
+export const useFetchAdvancedAnalyticsUrl = (token, shortUrl, enabled = false) => {
+    return useQuery(
+        ["advanced-analytics-url", shortUrl, token],
+        async () => {
+            return await api.get(`/api/analytics/advanced/url/${shortUrl}`, {
+                headers: {
+                    Accept: "application/json",
+                    Authorization: "Bearer " + token,
+                },
+            });
+        },
+        {
+            select: (data) => data.data,
+            // Only fire if the drawer is open AND user has access
+            enabled: enabled && !!token && !!shortUrl,
+            staleTime: 60000,
+            retry: false,
+        }
+    );
+};
