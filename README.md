@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 Features
+## Features
 
 - **High-Speed Redirection:** Optimized URL resolution with synchronous cache-ready lookups ensuring minimal latency during redirects.
 - **Asynchronous Telemetry Pipeline:** Non-blocking click event processing, including GeoIP resolution and User-Agent parsing (Browser, OS, Device).
@@ -16,7 +16,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 
@@ -38,7 +38,7 @@
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 linkblink/
@@ -58,16 +58,16 @@ linkblink/
 
 ---
 
-## 📦 Installation & Setup
+## Installation & Setup
 
-### 1️⃣ Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/linkblink.git
 cd linkblink
 ```
 
-### 2️⃣ Setup the Backend (Spring Boot)
+### Setup the Backend (Spring Boot)
 
 Ensure you have Java 17+ and Maven installed.
 
@@ -96,7 +96,7 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-### 3️⃣ Setup the Frontend (React)
+### Setup the Frontend (React)
 
 Open a new terminal window and navigate to the frontend directory:
 
@@ -119,9 +119,9 @@ npm start
 
 ---
 
-## 📜 API Endpoints
+## API Endpoints
 
-### 🔐 Authentication & Identity
+### Authentication & Identity
 
 | Method | Endpoint | Description | Access |
 |----------|----------|-------------|----------|
@@ -129,7 +129,7 @@ npm start
 | POST | `/api/auth/public/login` | Authenticate and receive a JWT | Public |
 | GET | `/api/auth/users/me` | Fetch current user profile and tier limits | Secured |
 
-### 🔗 URL Management & Redirection
+### URL Management & Redirection
 
 | Method | Endpoint | Description | Access |
 |----------|----------|-------------|----------|
@@ -140,7 +140,7 @@ npm start
 | DELETE | `/api/urls/{id}` | Delete a single link and cascade click events | Secured |
 | DELETE | `/api/urls/bulk` | Bulk delete multiple links safely | Secured |
 
-### 📊 Dashboard & Analytics
+### Dashboard & Analytics
 
 | Method | Endpoint | Description | Access |
 |----------|----------|-------------|----------|
@@ -150,7 +150,7 @@ npm start
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 To deploy LinkBlink to a production environment:
 
@@ -178,7 +178,7 @@ For enterprise-scale traffic, configure the Upstash/Tinybird adapters in `applic
 
 ---
 
-## 🎯 Contribution
+## Contribution
 
 Contributions to LinkBlink are welcome!
 
